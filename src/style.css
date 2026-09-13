@@ -39,14 +39,14 @@
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --background: oklch(41.75% 0.05 242 / 2%);
-  --background-raised: #171716;
+  --background: oklch(0.1448 0 0);
+  --background-raised: #0f0f0f;
   --background-muted: #242422;
-  --background-sunken: #121211;
+  --background-sunken: #0c0c0c;
   --foreground: #f0e8e4;
   --muted-foreground: #b0aaa6;
   --quiet-foreground: #77736f;
-  --border: #383735;
+  --border: #38372550;
   --border-strong: #4b4946;
   --accent: oklch(0.745 0.124 244.77);
   --accent-hover: oklch(48% 0.03 256.802);
@@ -237,8 +237,8 @@ a {
 }
 
 .button-primary {
-  background: var(--accent);
-  color: var(--accent-foreground);
+  background: var(--foreground);
+  color: var(--background);
 }
 
 .button-primary:hover {
@@ -310,7 +310,7 @@ a {
 }
 
 .site-header-left > .brand {
-  width: calc(var(--sidebar-width) - 1.1rem);
+  width: calc(var(--sidebar-width) - 1.15rem);
   flex: 0 0 auto;
 }
 
