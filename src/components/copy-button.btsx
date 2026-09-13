@@ -1,0 +1,40 @@
+module "use client";
+import { useRef, useState } from "octane";
+import { Icon } from "@/lib/icons";
+module
+  type CopyButtonProps = {
+    ~ value: string;
+    ~ label?: string;
+    ~ compact?: boolean;
+    ~ };
+component CopyButtonRoot
+  props { value, label = "Copy", compact = false, }: CopyButtonProps
+  setup
+    const [copied, setCopied] = useState(false);
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    async function copy() {
+      try {
+        await navigator.clipboard.writeText(value);
+        setCopied(true);
+        if (timeoutRef.current)
+          clearTimeout(timeoutRef.current);
+        timeoutRef.current = setTimeout(() => setCopied(false), 1600);
+      }
+      catch {
+        setCopied(false);
+      }
+    }
+  button(
+    ~ type="button"
+    ~ className={compact ? "copy-button copy-button-compact" : "copy-button"}
+    ~ onClick={copy}
+    ~ aria-label={copied ? "Copied" : label}
+    ~ title={copied ? "Copied" : label}
+    ~ )
+    Icon(name={copied ? 'check' : 'copy'} size={15} aria-hidden="true")
+    if !(compact)
+      span #{copied ? "Copied" : label}
+
+props {...props}: CopyButtonProps
+CopyButtonRoot({...props})

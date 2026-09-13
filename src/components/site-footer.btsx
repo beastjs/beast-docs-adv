@@ -1,0 +1,65 @@
+import { Link } from "@octanejs/tanstack-router";
+import { githubUrl } from "../lib/docs";
+import { useBeastRelease } from "../lib/release";
+import Brand from "./brand.btsx";
+component SiteFooterRoot
+  setup const release = useBeastRelease();
+  footer.site-footer
+    .footer-top
+      .footer-brand
+        Brand
+        p
+          | A compact authoring layer for explicit, native
+          | #{" "}
+          a(
+            ~ className="text-[#ff415a]! hover:underline! underline-offset-4 decoration-dashed"
+            ~ href="https://octanejs.dev"
+            ~ target="_blank"
+            ~ rel="noreferrer"
+            ~ )
+            | Octane
+          | #{" "}
+          | templates.
+      .footer-links
+        div
+          p Documentation
+          Link(to="/docs/get-started") Quick start
+          Link(to="/docs/language") Language
+          Link(to="/docs/vite") Integration
+          Link(to="/docs/examples") Examples
+        div
+          p Project
+          a(href={githubUrl} target="_blank" rel="noreferrer") GitHub
+          a(
+            ~ href="https://github.com/phtn/nvim-treesitter/tree/add-beast-parser"
+            ~ target="_blank"
+            ~ rel="noreferrer"
+            ~ )
+            | Neovim parser
+          a(href="https://zed.dev/extensions/beast" target="_blank" rel="noreferrer") Zed extension
+          a(
+            ~ href={`https://marketplace.visualstudio.com/items?itemName=phtn.beastjs`}
+            ~ target="_blank"
+            ~ rel="noreferrer"
+            ~ )
+            | VS Code extension
+    .footer-bottom
+      span Beast #{release.version} is open source and currently in alpha.
+      span
+        | Made for
+        | #{" "}
+        Link(
+          ~ to="https://github.com/beast"
+          ~ className="hover:text-accent! hover:underline underline-offset-4 decoration-dotted font-medium"
+          ~ )
+          span Beast
+        | #{" "}
+        | by
+        | #{" "}
+        Link(
+          ~ to="https://github.com/phtn"
+          ~ className="hover:text-accent! hover:underline underline-offset-4 decoration-dotted font-medium"
+          ~ )
+          span phtn
+
+SiteFooterRoot

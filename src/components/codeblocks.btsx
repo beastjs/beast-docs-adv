@@ -1,0 +1,73 @@
+import hljs from "@/lib/btsx-hljs";
+import CopyButton from "./copy-button.btsx";
+module
+  type CodeBlockProps = {
+    ~ code: string;
+    ~ filename?: string;
+    ~ language?: string;
+    ~ className?: string;
+    ~ };
+  // Map docs language ids to highlight.js ids
+  // Map docs language ids to highlight.js ids
+  function normalizeLang(lang?: string): string | undefined {
+    if (!lang)
+      return undefined;
+    const l = lang.toLowerCase();
+    if (l === "btsx" || l === "beast")
+      return "btsx";
+    if (l === "tsrx")
+      return "tsrx";
+    if (l === "shell" || l === "bash" || l === "sh")
+      return "bash";
+    if (l === "text" || l === "txt")
+      return undefined;
+    // highlight.js uses "typescript" for ts, "javascript" for js
+    if (["ts", "typescript", "tsx", "js", "javascript", "css", "json", "html", "xml"].includes(l))
+      return l;
+    // fallback: let hljs auto-detect or plain
+    return hljs.getLanguage(l) ? l : undefined;
+  }
+component CodeBlockRoot
+  props { code, filename, language, className = "" }: CodeBlockProps
+  setup
+    const lang = normalizeLang(language);
+    let highlighted: string | null = null;
+
+    try {
+      if (lang && hljs.getLanguage(lang)) {
+        highlighted = hljs.highlight(code, { language: lang }).value;
+      }
+      else if (lang === undefined) {
+        highlighted = null;
+      }
+      else {
+        highlighted = hljs.highlightAuto(code).value;
+      }
+    }
+    catch {
+      highlighted = null;
+    }
+
+    const lines = highlighted ? highlighted.split("\n") : null;
+  div(suppressHydrationWarning className={`code-block ${className}`.trim()})
+    .code-block-header
+      span.code-file #{filename ?? "Code"}
+      span.code-header-actions
+        if language
+          span.code-language #{language}
+        CopyButton(value={code} compact)
+    pre
+      code(suppressHydrationWarning)
+        if lines
+          each line, index in lines key index
+            span.code-line(suppressHydrationWarning)
+              span.line-number(aria-hidden="true") #{index + 1}
+              span(className="line-content hljs" dangerouslySetInnerHTML={{ __html: line || " " }})
+        else
+          each line, index in code.split("\n") key `${index}-${line}`
+            span.code-line
+              span.line-number(aria-hidden="true") #{index + 1}
+              span.line-content #{line || " "}
+
+props {...props}: CodeBlockProps
+CodeBlockRoot({...props})

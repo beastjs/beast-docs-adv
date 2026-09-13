@@ -1,0 +1,86 @@
+import { Icon } from "@/lib/icons";
+import { Link } from "@octanejs/tanstack-router";
+import { githubUrl } from "../lib/docs";
+import Brand from "./brand.btsx";
+import MobileNav from "./mobile-nav.btsx";
+import Search from "./search.btsx";
+import ThemeToggle from "./theme-toggle.btsx";
+
+module
+  type SiteHeaderProps = {
+    ~ section?: "home" | "docs" | "language" | "skills" | "tooling" | "integrations" | "examples";
+    ~ };
+  const headerLinks = [
+    { label: "Docs", href: "/docs", section: "docs", external: false },
+    {
+      label: "Language",
+      href: "/docs/language",
+      section: "language",
+      external: false
+    },
+    {
+      label: "Skills",
+      href: "/docs/skills",
+      section: "skills",
+      external: false
+    },
+    {
+      label: "Tooling",
+      href: "/docs/cli",
+      section: "tooling",
+      external: false
+    },
+    {
+      label: "Integrations",
+      href: "/docs/vite",
+      section: "integrations",
+      external: false
+    },
+    {
+      label: "Examples",
+      href: "/docs/examples",
+      section: "examples",
+      external: false
+    }
+  ] as const;
+component SiteHeaderRoot
+  props { section = "home" }: SiteHeaderProps
+  header.site-header(suppressHydrationWarning)
+    .site-header-inner
+      .site-header-left
+        Brand
+        nav(className="header-nav font-sans" aria-label="Primary navigation")
+          each item in headerLinks key item.href
+            if item.external
+              a(
+                ~ href={item.href}
+                ~ className={section === item.section ? "active" : undefined}
+                ~ aria-current={section === item.section ? "page" : undefined}
+                ~ target="_blank"
+                ~ rel="noreferrer"
+                ~ )
+                | #{item.label}
+            else
+              Link(
+                ~ to={item.href}
+                ~ activeOptions={{ exact: true }}
+                ~ className={section === item.section ? "active" : undefined}
+                ~ aria-current={section === item.section ? "page" : undefined}
+                ~ )
+                | #{item.label}
+      .site-header-actions
+        Search
+        a(
+          ~ className="icon-button github-button"
+          ~ href={githubUrl}
+          ~ target="_blank"
+          ~ rel="noreferrer"
+          ~ aria-label="Beast on GitHub"
+          ~ title="Beast on GitHub"
+          ~ )
+          Icon(name="github" className='size-4')
+        ThemeToggle
+        MobileNav
+
+props {...props}: SiteHeaderProps
+SiteHeaderRoot({...props})

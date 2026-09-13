@@ -1,0 +1,12 @@
+import { useLocation } from "@octanejs/tanstack-router";
+import { useEffect } from "octane";
+component ScrollToTopRoot
+  setup
+    const pathname = useLocation({ select: (location) => location.pathname });
+
+    useEffect(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" as ScrollBehavior });
+    }, [pathname]);
+  | #{null}
+
+ScrollToTopRoot

@@ -1,0 +1,146 @@
+module "use client";
+import CodeBlock from "./codeblocks.btsx";
+import { useState } from "octane";
+import {Icon} from '@/lib/icons'
+module
+  const examples = [
+    {
+      id: "authoring",
+      label: "Authoring",
+      title: "Write the structure",
+      description: "Indentation replaces closing tags while TypeScript stays beside the template it powers.",
+      icon: 'folder-code',
+      input: {
+        filename: "Card.btsx",
+        language: "btsx",
+        code: `props { user, messages }: Props
+
+  .card
+    h1 Welcome, #{user.name}
+    ul.messages
+    each message in messages key message.id
+        li #{message.text}`
+      },
+      output: {
+        filename: "Card.tsrx",
+        language: "tsrx",
+        code: `export default function Card({ user, messages }: Props) @{
+    <div className="card">
+    <h1>Welcome, {user.name}</h1>
+    <ul className="messages">
+        @for (const message of messages; key message.id) {
+      <li>{message.text}</li>
+        }
+    </ul>
+    </div>
+  }`
+      }
+    },
+    {
+      id: "control-flow",
+      label: "Control flow",
+      title: "Keep native semantics",
+      description: "Conditions, loops, switches, and boundaries stay as Octane template operations.",
+      icon: 'plugin',
+      input: {
+        filename: "Status.btsx",
+        language: "btsx",
+        code: `switch status
+    case "ready"
+    Dashboard(data={data})
+    case "loading"
+    LoadingView
+    default
+    ErrorView
+
+  each item in items key item.id
+    Result(item={item})
+  empty
+    p No results yet.`
+      },
+      output: {
+        filename: "Status.tsrx",
+        language: "tsrx",
+        code: `@switch (status) {
+    @case ("ready") { <Dashboard data={data} /> }
+    @case ("loading") { <LoadingView /> }
+    @default { <ErrorView /> }
+  }
+
+  @for (const item of items; key item.id) {
+    <Result item={item} />
+  } @empty {
+    <p>No results yet.</p>
+  }`
+      }
+    },
+    {
+      id: "tooling",
+      label: "Tooling",
+      title: "Use the tools you know",
+      description: "Beast runs before Octane in Vite, Rspack, or Rsbuild with normal imports, SSR, and production builds.",
+      icon: 'build',
+      input: {
+        filename: "vite.config.ts",
+        language: "ts",
+        code: `import { defineConfig } from "vite";
+  import { beastOctane } from "beast-tsrx/vite";
+
+  export default defineConfig({
+    plugins: [
+    beastOctane({
+        octane: { strong: true },
+    }),
+    ],
+  });`
+      },
+      output: {
+        filename: "src/main.ts",
+        language: "ts",
+        code: `import App from "./App.btsx";
+  import { NativePanel } from "./NativePanel.tsrx";
+
+  // Beast transforms BTSX in memory.
+  // Octane validates and lowers both source types.
+  // Vite owns serving, HMR, SSR, and production.
+
+  export { App, NativePanel };`
+      }
+    }
+  ] as const;
+component CompilerShowcaseRoot
+  setup
+    const [activeId, setActiveId] = useState<(typeof examples)[number]["id"]>("authoring");
+    const active = examples.find((example) => example.id === activeId) ?? examples[0];
+  .showcase-shell(suppressHydrationWarning)
+    .showcase-tabs(role="tablist" aria-label="Beast capabilities")
+      each example in examples key example.id
+        button(
+          ~ type="button"
+          ~ role="tab"
+          ~ aria-selected={example.id === activeId}
+          ~ aria-controls={`showcase-panel-${example.id}`}
+          ~ id={`showcase-tab-${example.id}`}
+          ~ className={example.id === activeId ? "active" : undefined}
+          ~ onClick={() => setActiveId(example.id)}
+          ~ )
+          Icon(name={example.icon} size={15} aria-hidden="true")
+          | #{example.label}
+    .showcase-panel(
+      ~ id={`showcase-panel-${active.id}`}
+      ~ role="tabpanel"
+      ~ aria-labelledby={`showcase-tab-${active.id}`}
+      ~ )
+      .showcase-heading
+        span.feature-icon
+          Icon(name={active.icon} size={16} aria-hidden="true")
+        div
+          h3 #{active.title}
+          p #{active.description}
+      .compiler-comparison
+        CodeBlock({...active.input})
+        span.compiler-arrow(aria-hidden="true")
+          Icon(name="arrow-right" size={18})
+        CodeBlock({...active.output})
+
+CompilerShowcaseRoot

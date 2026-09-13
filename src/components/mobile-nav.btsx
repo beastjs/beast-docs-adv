@@ -1,0 +1,49 @@
+module "use client";
+import {Link} from "@octanejs/tanstack-router";
+import { navigation } from "../lib/docs";
+import { Icon } from "@/lib/icons";
+import Brand from "./brand.btsx";
+import { useRef } from "octane";
+component MobileNavRoot
+  setup
+    const dialogRef = useRef<HTMLDialogElement>(null);
+
+    function close() {
+      dialogRef.current?.close();
+    }
+  fragment
+    button(
+      ~ className="icon-button mobile-menu-button"
+      ~ type="button"
+      ~ aria-label="Open navigation"
+      ~ onClick={() => dialogRef.current?.showModal()}
+      ~ )
+      Icon(name='menu' size={19} aria-hidden="true")
+    dialog.mobile-nav-dialog(
+      ~ ref={dialogRef}
+      ~ aria-label="Documentation navigation"
+      ~ onClick={(event) => {
+      ~ if (event.currentTarget === event.target)
+      ~ close();
+      ~ }}
+      ~ )
+      .mobile-nav-panel
+        .mobile-nav-header
+          Brand
+          button.icon-button(type="button" aria-label="Close navigation" onClick={close})
+            Icon(name='close' size={18} aria-hidden="true")
+        nav.mobile-nav-content(aria-label="Mobile documentation")
+          each section in navigation key section.label
+            section.mobile-nav-section
+              p #{section.label}
+              ul
+                each item in section.items key item.href
+                  li
+                    if item.external
+                      a(href={item.href} target="_blank" rel="noreferrer" onClick={close})
+                        span #{item.label}
+                        Icon(name='arrow-up-right' size={14} aria-hidden="true")
+                    else
+                      Link(to={item.href} onClick={close}) #{item.label}
+
+MobileNavRoot

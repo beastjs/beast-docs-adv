@@ -1,0 +1,16 @@
+import { Icon } from "@/lib/icons";
+import {Link} from "@octanejs/tanstack-router";
+module
+  type BrandProps = {
+    ~ compact?: boolean;
+    ~ };
+component BrandRoot
+  props { compact = false }: BrandProps
+  Link(className="brand" to="/" aria-label="Beast documentation home")
+    Icon(name="beast" className="size-6")
+    if !(compact)
+      .skew-2
+        span(className="brand-name font-okx font-bold tracking-wider uppercase") Beast
+
+props {...props}: BrandProps
+BrandRoot({...props})

@@ -1,0 +1,160 @@
+import { Icon } from "@/lib/icons";
+import { Link, useParams } from "@octanejs/tanstack-router";
+import { useEffect } from "octane";
+import CodeBlock from "../components/codeblocks.btsx";
+import Sidebar from "../components/sidebar.btsx";
+import SiteFooter from "../components/site-footer.btsx";
+import SiteHeader from "../components/site-header.btsx";
+import { type DocPage, docPages, githubUrl, orderedDocPages } from "../lib/docs";
+module
+  function getPage(slug?: string) {
+    return docPages[(slug ?? "").replace(/^\/+|\/+$/g, "")];
+  }
+  function pageSection(page: DocPage) {
+    if (page.eyebrow === "Language")
+      return "language" as const;
+    if (page.eyebrow === "Skills")
+      return "skills" as const;
+    if (page.eyebrow === "Tooling")
+      return "tooling" as const;
+    if (page.eyebrow === "Integrations")
+      return "integrations" as const;
+    if (page.eyebrow === "Examples")
+      return "examples" as const;
+    return "docs" as const;
+  }
+component InlineText
+  props { text }: { text: string }
+  each part, index in text.split(/(`[^`]+`)/g).filter(Boolean) key `${index}-${part}`
+    if part.startsWith("`") && part.endsWith("`")
+      code #{part.slice(1, -1)}
+    else
+      span #{part}
+component Thumbnail
+  props { src, label = "thumbnail" }: { src: string; label?: string }
+  img(src={src} alt={label} width={400} height={400} className="size-12 aspect-auto -mt-4")
+component ExternalLink
+  props { label, href }: { label?: string; href: string }
+  a(href={href} target="_blank" rel="noreferrer" className="flex items-center space-x-1 text-sm")
+    span(className="text-blue-500 dark:text-blue-400") #{label ?? href}
+    Icon(name="arrow-up-right" size={12} className="text-blue-500 animate-bounce")
+component NotFound
+  fragment
+    SiteHeader(section="docs")
+    div(className="site-frame docs-frame")
+      Sidebar
+      article.docs-article
+        header.article-header
+          span.section-kicker 404
+          h1 Page not found
+          p This documentation page does not exist.
+          Link(to="/docs") Back to docs
+    SiteFooter
+component DocsPageRoot
+  props { page }: { page: DocPage }
+  setup
+    const pageIndex = orderedDocPages.findIndex((candidate) => candidate.slug === page.slug);
+    const previous = pageIndex > 0 ? orderedDocPages[pageIndex - 1] : undefined;
+    const next = pageIndex >= 0 && pageIndex < orderedDocPages.length - 1 ? orderedDocPages[pageIndex + 1] : undefined;
+    const currentHref = `/docs${page.slug ? `/${page.slug}` : ""}`;
+
+    useEffect(() => {
+      document.title = `${page.title} — Beast`;
+    }, [page.title]);
+  fragment
+    SiteHeader(section={pageSection(page)})
+    div(className="site-frame docs-frame")
+      Sidebar(currentHref={currentHref})
+      main#main-content.docs-main
+        article.docs-article
+          .breadcrumbs(aria-label="Breadcrumb")
+            Link(to="/docs") Docs
+            span(aria-hidden="true") /
+            span #{page.eyebrow}
+          header.article-header
+            span.section-kicker #{page.eyebrow}
+            h1 #{page.title}
+            p #{page.description}
+            .article-actions
+              a.article-action(
+                ~ href={`${githubUrl}/blob/main/README.md`}
+                ~ target="_blank"
+                ~ rel="noreferrer"
+                ~ )
+                Icon(name="github" className="size-3.5")
+                span(className="font-mono font-normal") source
+                Icon(name="arrow-up-right" size={12} aria-hidden="true")
+          .article-rule
+          each section in page.sections key section.id
+            section.article-section(id={section.id})
+              div(className="flex items-center space-x-6")
+                if section.thumbnail
+                  Thumbnail({...section.thumbnail})
+                h2
+                  a(href={`#${section.id}`}) #{section.title}
+              each paragraph in section.paragraphs ?? [] key paragraph
+                p
+                  InlineText(text={paragraph})
+              if section.external
+                ExternalLink({...section.external})
+              if section.list
+                ul.article-list
+                  each item in section.list key item
+                    li
+                      InlineText(text={item})
+              if section.code
+                CodeBlock({...section.code})
+              if section.table
+                .table-wrap
+                  table
+                    thead
+                      tr
+                        each header in section.table.headers key header
+                          th #{header}
+                    tbody
+                      each row in section.table.rows key row.join("-")
+                        tr
+                          each cell, index in row key `${cell}-${index}`
+                            td
+                              InlineText(text={cell})
+              if section.note
+                aside(className={`article-note ${section.note.tone === "warning" ? "warning" : "info"}`})
+                  strong #{section.note.title}
+                  p
+                    InlineText(text={section.note.body})
+          nav.article-pagination(aria-label="Documentation pages")
+            if previous
+              Link(to={`/docs${previous.slug ? `/${previous.slug}` : ""}`})
+                Icon(name="arrow-right" size={15} className="rotate-180" aria-hidden="true")
+                span
+                  small Previous
+                  strong #{previous.title}
+            else
+              span
+            if next
+              Link(to={`/docs/${next.slug}`} className="next-page")
+                span
+                  small Next
+                  strong #{next.title}
+                Icon(name="arrow-right" size={15} aria-hidden="true")
+            else
+              span
+        aside.article-toc(aria-label="On this page")
+          p On this page
+          nav
+            each section in page.sections key section.id
+              a(href={`#${section.id}`}) #{section.title}
+          .toc-feedback
+            span Was this helpful?
+            div
+              a(href={`${githubUrl}/issues/new`} target="_blank" rel="noreferrer") Send feedback
+    SiteFooter
+
+setup
+  const params = useParams({ strict: false }) as { _splat?: string };
+  const page = getPage(params._splat);
+
+if page
+  DocsPageRoot(page={page})
+else
+  NotFound

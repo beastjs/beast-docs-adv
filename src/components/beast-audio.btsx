@@ -1,0 +1,72 @@
+module "use client";
+import { useEffect, useRef } from "octane";
+module
+  const STORAGE_KEY = "beast-best-played";
+component BeastAudioRoot
+  setup
+    const ref = useRef<HTMLAudioElement>(null);
+
+    useEffect(() => {
+      try {
+        if (localStorage.getItem(STORAGE_KEY))
+          return;
+      }
+      catch {
+        // ignore storage errors (private mode)
+      }
+      const audio = ref.current;
+      if (!audio)
+        return;
+      audio.volume = 0.7;
+      // ensure preload is auto only when we intend to play
+      audio.preload = "auto";
+      const markPlayed = () => {
+        try {
+          localStorage.setItem(STORAGE_KEY, "1");
+        }
+        catch { }
+      };
+      const tryPlay = async () => {
+        try {
+          await audio.play();
+          markPlayed();
+        }
+        catch {
+          // Autoplay blocked — wait for first user interaction
+          const onInteract = async () => {
+            try {
+              await audio.play();
+              markPlayed();
+            }
+            catch {
+              // still blocked, give up
+            }
+          };
+          window.addEventListener("click", onInteract, { once: true });
+          window.addEventListener("keydown", onInteract, { once: true });
+          window.addEventListener("touchstart", onInteract, { once: true, passive: true } as AddEventListenerOptions);
+        }
+      };
+      const schedule = () => {
+        const cb = () => tryPlay();
+        // Run after browser is idle so it doesn"t compete with LCP/hydration
+        const ric = (window as unknown as {
+          requestIdleCallback?: (cb: () => void, opts?: {
+            timeout: number;
+          }) => number;
+        }).requestIdleCallback;
+        if (ric)
+          ric(cb, { timeout: 1500 });
+        else
+          setTimeout(cb, 400);
+        };
+      if (document.readyState === "complete") {
+        schedule();
+      }
+      else {
+        window.addEventListener("load", schedule, { once: true });
+      }
+    }, [])
+  audio(ref={ref} src="/greeting.mp3" preload="metadata" hidden aria-hidden="true")
+
+BeastAudioRoot

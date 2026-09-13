@@ -1,0 +1,41 @@
+import { Link } from "@octanejs/tanstack-router";
+import { Icon } from "@/lib/icons";
+import { navigation } from "../lib/docs";
+import { useBeastRelease } from "../lib/release";
+module
+  type SidebarProps = {
+    ~ currentHref?: string;
+    ~ };
+component SidebarRoot
+  props { currentHref = "" }: SidebarProps
+  setup const release = useBeastRelease();
+  .sidebar-column
+    aside.sidebar
+      nav(className="sidebar-nav font-okx" aria-label="Documentation")
+        each section in navigation key section.label
+          section.sidebar-section
+            p.sidebar-label #{section.label}
+            ul
+              each item in section.items key item.href
+                li
+                  if item.external
+                    a.sidebar-link(href={item.href} target="_blank" rel="noreferrer")
+                      span #{item.label}
+                      Icon(name='arrow-up-right' size={12} aria-hidden="true")
+                  else
+                    Link(
+                      ~ className={`sidebar-link${currentHref === item.href ? " active" : ""}`}
+                      ~ to={item.href}
+                      ~ activeOptions={{ exact: true }}
+                      ~ aria-current={currentHref === item.href ? "page" : undefined}
+                      ~ )
+                      | #{item.label}
+      .sidebar-status
+        span.status-dot(aria-hidden="true")
+          Icon(name='circle-dot' size={13})
+        span
+          strong Beast #{release.version}
+          small Alpha release
+
+props {...props}: SidebarProps
+SidebarRoot({...props})

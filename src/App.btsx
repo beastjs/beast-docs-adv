@@ -1,0 +1,223 @@
+import { Icon } from "@/lib/icons";
+import {Link} from "@octanejs/tanstack-router";
+import BeastAudio  from "./components/beast-audio.btsx";
+import CompilerShowcase  from "./components/compiler-showcase.btsx";
+import CopyButton  from "./components/copy-button.btsx";
+import CornerMarks  from "./components/corner-marks.btsx";
+import Sidebar  from "./components/sidebar.btsx";
+import SiteFooter  from "./components/site-footer.btsx";
+import SiteHeader from "./components/site-header.btsx";
+import { githubUrl } from "./lib/docs";
+import { getProjectStatus } from './lib/status'
+import { useBeastRelease } from './lib/release'
+
+module
+  const command = "bun create beast@latest my-app";
+  const features = [
+    {
+      title: "Indentation-first",
+      description: "Write a component tree without closing tags. Spaces define structure and diagnostics point back to your source.",
+      icon: "indent-plus",
+      color: "blue"
+    },
+    {
+      title: "Native control flow",
+      description: "Conditions, keyed loops, switches, pending states, and catches compile to Octane operations.",
+      icon: "braces",
+      color: "green"
+    },
+    {
+      title: "Types stay intact",
+      description: "Props, imports, setup code, and embedded expressions remain TypeScript source for final validation.",
+      icon: "shield-check",
+      color: "violet"
+    },
+    {
+      title: "Bring your bundler",
+      description: "Use Vite, Rspack, or Rsbuild with Octane, including HMR, SSR transforms, and production builds.",
+      icon: "zap",
+      color: "orange"
+    }
+  ] as const;
+  const docsCards = [
+    {
+      eyebrow: "Start here",
+      title: "Create your first Beast app",
+      description: "Choose Vite, Rspack, or Rsbuild plus an Octane-native UI library.",
+      href: "/docs/get-started",
+      icon: "sparkle"
+    },
+    {
+      eyebrow: "Language",
+      title: "Elements and nesting",
+      description: "Learn selectors, attributes, text, interpolation, and roots.",
+      href: "/docs/language",
+      icon: "scan-text"
+    },
+    {
+      eyebrow: "Skills",
+      title: "Migrate React to Beast",
+      description: "Audit and port complete React applications while preserving behavior and routes.",
+      href: "/docs/react-to-beast",
+      icon: "git-branch"
+    },
+    {
+      eyebrow: "Tooling",
+      title: "CLI reference",
+      description: "Compile components and build mixed BTSX and TSRX source trees.",
+      href: "/docs/cli",
+      icon: "terminal-sq"
+    },
+    {
+      eyebrow: "Integrations",
+      title: "Bundler integrations",
+      description: "Connect Beast and Octane to Vite, Rspack, or Rsbuild.",
+      href: "/docs/vite",
+      icon: "plugin"
+    },
+    {
+      eyebrow: "Examples",
+      title: "BTSX to TSRX examples",
+      description: "Compare tested Beast source with the readable TSRX it generates.",
+      href: "/docs/examples",
+      icon: "code"
+    }
+  ] as const;
+  const pipeline = [
+    { label: ".btsx", caption: "Source", icon: "beast" },
+    { label: "Parser", caption: "Indentation", icon: "scan-text" },
+    { label: "Beast AST", caption: "Source-located", icon: "ast" },
+    { label: ".tsrx", caption: "Readable output", icon: "code" },
+    { label: "Octane", caption: "Validation", icon: "octane" },
+    { label: "Bundler", caption: "Vite / Rspack / Rsbuild", icon: "rsbuild" }
+  ] as const;
+component HomeRoot
+  setup const release = useBeastRelease();
+  fragment
+    SiteHeader(section="home")
+    .site-frame
+      Sidebar
+      main#main-content.landing-main(suppressHydrationWarning)
+        .blueprint-lines(aria-hidden="true")
+        .landing-container
+          section.hero(aria-labelledby="hero-title")
+            .hero-kicker
+              span.pulse-dot(aria-hidden="true")
+              span #{release.version} · Alpha
+            h1#hero-title Beast Developer Docs
+            p Build apps fast. Even faster with machines.
+            .hero-actions
+              Link(to="/docs/get-started" className="button button-primary")
+                | Get started
+                Icon(name="arrow-right" size={15} aria-hidden="true")
+              a(className="button button-secondary" href={githubUrl} target="_blank" rel="noreferrer") View on GitHub
+            .hero-meta(aria-label="Built with")
+              span BTSX
+              i(aria-hidden="true")
+              span(className="text-[#863eff]") TSRX
+              i(aria-hidden="true")
+              span(className="text-[#ff415a]") Octane
+              i(aria-hidden="true")
+              span Vite / Rspack / Rsbuild
+          section(className="section install-section" aria-labelledby="install-title")
+            .section-heading-row
+              div
+                span(className="section-kicker opacity-80") Quick start
+                h2#install-title Create a Beast App.
+              Link(className="text-link" to="/docs/get-started")
+                | Read the guide
+                Icon(name="arrow-right" size={14} aria-hidden="true")
+            .install-panel
+              CornerMarks
+              .install-copy
+                span.feature-icon
+                  Icon(name="terminal-sq" size={17} aria-hidden="true")
+                div
+                  h3 Fully configured pipeline
+                  p The Beast project creator wires the compiler, Octane, TSRX checking, your chosen bundler, and an Octane-native UI library into a project you can inspect end to end.
+              .command-block
+                span(className="command-prompt font-okx dark:text-mist-500!" aria-hidden="true") $
+                code #{command}
+                CopyButton(value={command} label="")
+              .install-details
+                span
+                  Icon(name="checkbox-checked")
+                  |  Typed starter
+                span
+                  Icon(name="checkbox-checked")
+                  |  HMR ready
+                span
+                  Icon(name="checkbox-checked")
+                  |  Production build
+          section.section(aria-labelledby="compiler-title")
+            .section-heading
+              span(className="section-kicker opacity-80") The compiler
+              h2#compiler-title Small syntax. Native output.
+              p Beast stays deliberately narrow: it makes templates compact, then gets out of the toolchain's way.
+            CompilerShowcase
+          section.section(aria-labelledby="features-title")
+            .section-heading
+              span.section-kicker Why Beast
+              h2#features-title Built to remain transparent
+              p Every layer is explicit—from the source you author to the TSRX Octane receives.
+            .feature-grid
+              CornerMarks
+              each feature in features key feature.title
+                article.feature-card
+                  span(className={`feature-icon`})
+                    Icon(name={feature.icon} size={17} aria-hidden="true")
+                  h3 #{feature.title}
+                  p #{feature.description}
+          section.section(aria-labelledby="pipeline-title")
+            div(className="section-heading-row pipeline-heading")
+              div
+                span.section-kicker How it works
+                h2#pipeline-title From source to browser
+              Link(className="text-link" to="/docs/how-it-works")
+                | Follow the pipeline
+                Icon(name="arrow-right" size={14} aria-hidden="true")
+            .pipeline
+              CornerMarks
+              each step, index in pipeline key step.label
+                .pipeline-step
+                  span.pipeline-index #{String(index + 1).padStart(2, "0")}
+                  Icon(name={step.icon} size={18} aria-hidden="true")
+                  strong #{step.label}
+                  small #{step.caption}
+          section.section(aria-labelledby="explore-title")
+            .section-heading
+              span.section-kicker Explore the docs
+              h2#explore-title Everything you need to build and migrate
+              p Learn the language, equip your agent, use the tooling, connect integrations, and explore tested examples.
+            .docs-card-grid
+              CornerMarks
+              each card in docsCards key card.href
+                Link(className="docs-card" to={card.href})
+                  .docs-card-top
+                    span(className="feature-icon neutral")
+                      Icon(name={card.icon} size={16} aria-hidden="true")
+                    Icon(name="arrow-right" className="card-arrow" size={15} aria-hidden="true")
+                  span.docs-card-kicker #{card.eyebrow}
+                  h3 #{card.title}
+                  p #{card.description}
+          section(className="section status-section" aria-labelledby="status-title")
+            .status-panel
+              CornerMarks
+              .status-copy
+                span.section-kicker Project status
+                h2#status-title Early, focused, and tested
+                p Beast #{release.version} is alpha software with a deliberately narrow language. The compiler, project builder, bundler integrations, and creator work today; the public API may still evolve.
+                a(
+                  ~ className="button button-secondary"
+                  ~ href={`${githubUrl}#project-status`}
+                  ~ target="_blank"
+                  ~ rel="noreferrer"
+                  ~ )
+                  | Read project status
+                  Icon(name="arrow-right" size={15} aria-hidden="true")
+              .status-ascii(aria-hidden="true")
+                pre #{getProjectStatus(release.version)}
+    SiteFooter
+    BeastAudio
+
+HomeRoot

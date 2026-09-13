@@ -1,0 +1,115 @@
+module "use client";
+import { Icon } from "@/lib/icons";
+import { Link } from "@octanejs/tanstack-router";
+import { searchItems } from "../lib/docs";
+import { useEffect, useMemo, useRef, useState } from "octane";
+
+component SearchResultContent
+  props { item }: { item: (typeof searchItems)[number] }
+  fragment
+    span.search-result-icon(aria-hidden="true")
+      Icon(name={item.external ? "arrow-up-right" : "folder"} size={14})
+    span.search-result-copy
+      span.search-result-label #{item.label}
+      if item.description
+        span.search-result-description #{item.description}
+    span.search-result-meta
+      span #{item.group}
+      Icon(name="arrow-right" size={12})
+component SearchRoot
+  setup
+    const dialogRef = useRef<HTMLDialogElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const [query, setQuery] = useState("");
+
+    function openSearch() {
+      const dialog = dialogRef.current;
+      if (!dialog || dialog.open)
+        return;
+      dialog.showModal();
+      requestAnimationFrame(() => inputRef.current?.focus());
+    }
+
+    function closeSearch() {
+      dialogRef.current?.close();
+      setQuery("");
+    }
+
+    useEffect(() => {
+      function onKeyDown(event: KeyboardEvent) {
+        if (event.key !== "/" || dialogRef.current?.open)
+          return;
+        event.preventDefault();
+        event.stopPropagation();
+        openSearch();
+      }
+      document.addEventListener("keydown", onKeyDown, true);
+      return () => document.removeEventListener("keydown", onKeyDown, true);
+    }, []);
+
+    const results = useMemo(() => {
+      const normalized = query.trim().toLowerCase();
+      if (!normalized)
+        return searchItems;
+      return searchItems.filter((item) => [item.label, item.description, item.group]
+        .filter(Boolean)
+        .some((value) => value?.toLowerCase().includes(normalized)));
+    }, [query]);
+  fragment
+    button(
+      ~ className="search-trigger font-sans px-0 xl:mr-2"
+      ~ type="button"
+      ~ onClick={openSearch}
+      ~ aria-keyshortcuts="/"
+      ~ )
+      Icon(name="search" className="hidden size-4 xl:flex xl:ml-0")
+      span(className='text-sm') Search docs
+      Icon(name="slash" className="xl:-mr-0.5")
+    dialog.search-dialog(
+      ~ ref={dialogRef}
+      ~ aria-label="Search Beast documentation"
+      ~ onClick={(event) => {
+      ~ if (event.currentTarget === event.target)
+      ~ closeSearch();
+      ~ }}
+      ~ )
+      div(className="search-panel font-okx")
+        .search-input-wrap
+          Icon(name="search")
+          input(
+            ~ ref={inputRef}
+            ~ type="search"
+            ~ value={query}
+            ~ onInput={(event) => setQuery(event.currentTarget.value)}
+            ~ placeholder="Search Beast docs…"
+            ~ aria-label="Search Beast docs"
+            ~ )
+          button.search-close(type="button" onClick={closeSearch} aria-label="Close search")
+            Icon(name="close")
+        .search-results(role="listbox" aria-label="Results")
+          if results.length > 0
+            each item in results key item.href
+              if item.external
+                a.search-result(
+                  ~ href={item.href}
+                  ~ target="_blank"
+                  ~ rel="noreferrer"
+                  ~ onClick={closeSearch}
+                  ~ )
+                  SearchResultContent(item={item})
+              else
+                Link(className="search-result" to={item.href} onClick={closeSearch})
+                  SearchResultContent(item={item})
+          else
+            .search-empty
+              span No pages found
+              p Try a language feature, tool, or command.
+        .search-footer
+          span.text-mist-500
+            kbd(className="bg-orange-300! font-semibold text-mist-700! border-mist-500!") esc
+            |  close
+          span.text-mist-500
+            kbd(className="bg-mist-300! font-semibold text-mist-700! border-mist-500! w-6 text-center") ↵
+            |  open
+
+SearchRoot
