@@ -9,7 +9,7 @@
     "size": "bun scripts/size.ts",
     "build:size": "bun run build && bun run size",
     "preview": "rspack serve --mode production",
-    "deploy": "bun run build && bunx wrangler deploy",
+    "deploy": "bun run build && wrangler deploy",
     "typecheck": "tsrx-tsc --noEmit",
     "check": "bun run typecheck && bun run build"
   },
@@ -21,15 +21,16 @@
     "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {
-    "@types/node": "^26.2.0",
-    "@tsrx/typescript-plugin": "0.3.135",
-    "typescript": "^5.9.3",
-    "tailwindcss": "^4.3.3",
-    "@rspack/core": "^2.2.2",
-    "@rspack/cli": "^2.2.2",
-    "@rspack/dev-server": "^2.2.1",
     "@octanejs/rspack-plugin": "0.1.48",
+    "@rspack/cli": "^2.2.2",
+    "@rspack/core": "^2.2.2",
+    "@rspack/dev-server": "^2.2.1",
     "@tailwindcss/postcss": "^4.3.3",
-    "postcss-loader": "^8.2.1"
+    "@tsrx/typescript-plugin": "0.3.135",
+    "@types/node": "^26.2.0",
+    "postcss-loader": "^8.2.1",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.9.3",
+    "wrangler": "4.131.1"
   }
 }

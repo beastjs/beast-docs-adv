@@ -145,7 +145,9 @@ In the Cloudflare dashboard, use:
 | Build command  | `bun run build`      |
 | Deploy command | `npx wrangler deploy` |
 
-To deploy from your machine, run `bun run deploy`. Everything in `public/` is
+`wrangler` is a pinned dev dependency, so the deploy command uses the installed
+copy instead of downloading it on each build. To deploy from your machine, run
+`bun run deploy`. Everything in `public/` is
 copied to the site root on build. Assets are requested from `/`, so deploy the
 site at the domain root.
 
