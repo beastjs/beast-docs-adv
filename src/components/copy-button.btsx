@@ -27,12 +27,12 @@ component CopyButtonRoot
     }
   button(
     ~ type="button"
-    ~ className={compact ? "copy-button copy-button-compact" : "copy-button"}
+    ~ className='copy-button'
     ~ onClick={copy}
     ~ aria-label={copied ? "Copied" : label}
     ~ title={copied ? "Copied" : label}
     ~ )
-    Icon(name={copied ? 'check' : 'copy'} size={15} aria-hidden="true")
+    Icon(name={copied ? 'check' : 'copy'} className='size-4.5' aria-hidden="true")
     if !(compact)
       span #{copied ? "Copied" : label}
 

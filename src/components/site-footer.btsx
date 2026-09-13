@@ -44,21 +44,23 @@ component SiteFooterRoot
             ~ )
             | VS Code extension
     .footer-bottom
-      span Beast #{release.version} is open source and currently in alpha.
+      span(className='space-x-1')
+        span(className='font-semibold') Beast
+        span #{release.version}
       span
-        | Made for
+        | built on
         | #{" "}
         Link(
           ~ to="https://github.com/beast"
-          ~ className="hover:text-accent! hover:underline underline-offset-4 decoration-dotted font-medium"
+          ~ className="hover:text-accent! hover:underline underline-offset-4 decoration-dotted font-semibold"
           ~ )
-          span Beast
+          span beastjs
         | #{" "}
         | by
         | #{" "}
         Link(
           ~ to="https://github.com/phtn"
-          ~ className="hover:text-accent! hover:underline underline-offset-4 decoration-dotted font-medium"
+          ~ className="hover:text-accent! hover:underline underline-offset-4 decoration-dotted font-semibold"
           ~ )
           span phtn
 

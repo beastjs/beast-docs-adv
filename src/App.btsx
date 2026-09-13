@@ -12,7 +12,7 @@ import { getProjectStatus } from './lib/status'
 import { useBeastRelease } from './lib/release'
 
 module
-  const command = "bun create beast@latest my-app";
+  const command = "bun x create-beast@latest app";
   const features = [
     {
       title: "Indentation-first",
@@ -118,25 +118,28 @@ component HomeRoot
               i(aria-hidden="true")
               span(className="text-[#ff415a]") Octane
               i(aria-hidden="true")
-              span Vite / Rspack / Rsbuild
+              span(className="") Vite
+              i(aria-hidden="true")
+              span(className="") Rspack
+              i(aria-hidden="true")
+              span(className="text-[#ff8b00]") Rsbuild
+
           section(className="section install-section" aria-labelledby="install-title")
             .section-heading-row
               div
                 span(className="section-kicker opacity-80") Quick start
                 h2#install-title Create a Beast App.
-              Link(className="text-link" to="/docs/get-started")
-                | Read the guide
-                Icon(name="arrow-right" size={14} aria-hidden="true")
             .install-panel
               CornerMarks
               .install-copy
                 span.feature-icon
-                  Icon(name="terminal-sq" size={17} aria-hidden="true")
+                  Icon(name="terminal" aria-hidden="true")
                 div
-                  h3 Fully configured pipeline
+                  h3(className='h-8 flex items-center')
+                    span Fully configured pipeline
                   p The Beast project creator wires the compiler, Octane, TSRX checking, your chosen bundler, and an Octane-native UI library into a project you can inspect end to end.
               .command-block
-                span(className="command-prompt font-okx dark:text-mist-500!" aria-hidden="true") $
+                span(className="ps-3 grid place-items-center font-mono font-light text-foreground/40 text-xs" aria-hidden="true") $
                 code #{command}
                 CopyButton(value={command} label="")
               .install-details
