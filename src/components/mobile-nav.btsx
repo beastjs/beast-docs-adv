@@ -1,6 +1,6 @@
 module "use client";
-import {Link} from "@octanejs/tanstack-router";
-import { navigation } from "../lib/docs";
+import Link from "./link.btsx";
+import { navigation } from "../lib/navigation";
 import { Icon } from "@/lib/icons";
 import Brand from "./brand.btsx";
 import { useRef } from "octane";

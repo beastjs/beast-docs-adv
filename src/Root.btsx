@@ -1,0 +1,18 @@
+import { lazy, Suspense, useEffect } from "octane";
+import { loadDocs, loadHome, usePathname } from "./lib/router";
+module
+  const HomePage = lazy(loadHome);
+  const DocsPage = lazy(loadDocs);
+setup
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (pathname === "/")
+      document.title = "Beast — Language, Integration & Skills";
+  }, [pathname]);
+
+Suspense(fallback={null})
+  if pathname === "/"
+    HomePage
+  else
+    DocsPage

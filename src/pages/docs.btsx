@@ -1,5 +1,6 @@
 import { Icon } from "@/lib/icons";
-import { Link, useParams } from "@octanejs/tanstack-router";
+import Link from "../components/link.btsx";
+import { usePathname } from "../lib/router";
 import { useEffect } from "octane";
 import CodeBlock from "../components/codeblocks.btsx";
 import Sidebar from "../components/sidebar.btsx";
@@ -151,8 +152,8 @@ component DocsPageRoot
     SiteFooter
 
 setup
-  const params = useParams({ strict: false }) as { _splat?: string };
-  const page = getPage(params._splat);
+  const pathname = usePathname();
+  const page = pathname === "/docs" || pathname.startsWith("/docs/") ? getPage(pathname.slice("/docs".length)) : undefined;
 
 if page
   DocsPageRoot(page={page})

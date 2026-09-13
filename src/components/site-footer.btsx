@@ -1,5 +1,5 @@
-import { Link } from "@octanejs/tanstack-router";
-import { githubUrl } from "../lib/docs";
+import Link from "./link.btsx";
+import { githubUrl } from "../lib/navigation";
 import { useBeastRelease } from "../lib/release";
 import Brand from "./brand.btsx";
 component SiteFooterRoot

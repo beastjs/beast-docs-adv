@@ -1,0 +1,32 @@
+import { isPlainLeftClick, navigate, preload } from "../lib/router";
+module
+  type LinkProps = {
+    to: string;
+    className?: string;
+    title?: string;
+    "aria-label"?: string;
+    "aria-current"?: "page" | undefined;
+    onClick?: (event: MouseEvent) => void;
+    children?: unknown;
+  };
+props { to, className, title, onClick, children, ...rest }: LinkProps
+setup
+  function handleClick(event: MouseEvent) {
+    onClick?.(event);
+    if (!isPlainLeftClick(event))
+      return;
+    event.preventDefault();
+    navigate(to);
+  }
+
+a(
+  ~ href={to}
+  ~ className={className}
+  ~ title={title}
+  ~ aria-label={rest["aria-label"]}
+  ~ aria-current={rest["aria-current"]}
+  ~ onClick={handleClick}
+  ~ onPointerEnter={() => preload(to)}
+  ~ onFocus={() => preload(to)}
+  ~ )
+  | #{children}

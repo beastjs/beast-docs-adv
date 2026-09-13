@@ -1,6 +1,6 @@
-import { Link } from "@octanejs/tanstack-router";
+import Link from "./link.btsx";
 import { Icon } from "@/lib/icons";
-import { navigation } from "../lib/docs";
+import { navigation } from "../lib/navigation";
 import { useBeastRelease } from "../lib/release";
 module
   type SidebarProps = {
@@ -26,7 +26,6 @@ component SidebarRoot
                     Link(
                       ~ className={`sidebar-link${currentHref === item.href ? " active" : ""}`}
                       ~ to={item.href}
-                      ~ activeOptions={{ exact: true }}
                       ~ aria-current={currentHref === item.href ? "page" : undefined}
                       ~ )
                       | #{item.label}

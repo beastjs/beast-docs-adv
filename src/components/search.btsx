@@ -1,7 +1,7 @@
 module "use client";
 import { Icon } from "@/lib/icons";
-import { Link } from "@octanejs/tanstack-router";
-import { searchItems } from "../lib/docs";
+import Link from "./link.btsx";
+import { searchItems } from "../lib/navigation";
 import { useEffect, useMemo, useRef, useState } from "octane";
 
 component SearchResultContent

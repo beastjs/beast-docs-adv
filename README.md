@@ -1,48 +1,146 @@
 # beast.docs
 
-A [Beast](https://www.npmjs.com/package/beast-tsrx) project powered by
-[TSRX](https://tsrx.dev/) and [Octane](https://octanejs.dev/).
+The documentation site for [Beast](https://github.com/phtn/beast), the
+indentation-first component language that compiles `.btsx` into
+[TSRX](https://tsrx.dev/) for [Octane](https://octanejs.dev/).
+
+The site is itself a Beast app: pages and components are authored in BTSX,
+compiled by `beast-tsrx`, and bundled with Rspack.
+
+## Getting started
 
 ```bash
 bun install
 bun run dev
 ```
 
-Edit `src/App.btsx` to get started. Declare typed props at the top of the BTSX
-file; the Beast bundler adapter compiles it into native TSRX and then lets Octane
-produce the browser module.
+The dev server runs at <http://localhost:8080>.
 
-The starter pins the tested `octane@0.1.49` toolchain. Run the complete local
-verification before shipping:
+| Script              | What it does                                         |
+| ------------------- | ---------------------------------------------------- |
+| `bun run dev`       | Start the Rspack dev server with HMR                 |
+| `bun run build`     | Production build into `dist/`                        |
+| `bun run size`      | Print raw, gzip, and brotli sizes of `dist/`         |
+| `bun run build:size`| Build, then print sizes                              |
+| `bun run preview`   | Serve a production-mode build locally                |
+| `bun run typecheck` | Type-check `.ts` sources with `tsrx-tsc`             |
+| `bun run check`     | `typecheck` followed by `build`                      |
 
-```bash
-bun run check
+## Stack
+
+- **Language:** BTSX via [`beast-tsrx`](https://www.npmjs.com/package/beast-tsrx), compiled to TSRX
+- **Runtime:** `octane`
+- **Routing:** a small History API router in `src/lib/router.ts`
+- **Bundler:** Rspack (`beastOctane()` adapter from `beast-tsrx/rspack`)
+- **Styling:** Tailwind CSS v4 plus hand-written CSS in `src/style.css`
+- **Code highlighting:** highlight.js with custom BTSX and TSRX grammars
+- **Fonts:** Geist and Geist Mono from Google Fonts (loaded in `index.html`)
+
+## Project layout
+
+```text
+index.html                 HTML shell, font links, favicon
+rspack.config.ts           Bundler config, output hashing, chunk splitting
+public/                    Static files served from the site root
+src/
+  main.ts                  App mount
+  Root.btsx                Picks the page for the current path, lazy-loaded
+  App.btsx                 Landing page (/)
+  pages/docs.btsx          Docs page renderer (/docs and /docs/*)
+  components/              Header, sidebar, search, code blocks, footer, …
+  lib/
+    navigation.ts          Sidebar/header navigation, search index, GitHub URL
+    docs.ts                All documentation page content
+    btsx-hljs.ts           highlight.js setup with BTSX/TSRX grammars
+    router.ts              usePathname, navigate, route chunk loaders
+    release.ts             Latest Beast release lookup (GitHub API)
+    icons/                 SVG icon set and the <Icon> component
 ```
 
-Use `scope` when setup belongs to an exact child position instead of the whole
-component:
+## Writing docs
 
-```btsx
-scope
-  setup const label = "Owned by this child";
-  p #{label}
-```
-
-Octane's experimental native-read signal mode remains opt-in. Enable it for
-both generated BTSX and native TSRX through the Vite adapter:
+Documentation content is data, not markup. Every page lives in `docPages` in
+[`src/lib/docs.ts`](src/lib/docs.ts), keyed by its slug (`''` is `/docs`,
+`'get-started'` is `/docs/get-started`):
 
 ```ts
-beastOctane({ octane: { nativeReads: true } })
+'get-started': {
+  slug: 'get-started',
+  eyebrow: 'Get started',
+  title: 'Quick start',
+  description: 'Scaffold a typed Beast and Octane application.',
+  sections: [
+    {
+      id: 'requirements',
+      title: 'Requirements',
+      paragraphs: ['Use `bun` or Node.js 22 or newer.'],
+      code: { filename: 'Terminal', language: 'bash', code: 'bun create beast@latest my-app' },
+      table: { headers: ['Option', 'Effect'], rows: [['`--no-git`', 'Skip git init']] },
+      note: { title: 'Alpha software', body: 'APIs may change.', tone: 'warning' }
+    }
+  ]
+}
 ```
 
-Record application changes in [CHANGELOG.md](CHANGELOG.md).
+- Text in `paragraphs`, `list`, table cells, and `note.body` supports inline
+  code with backticks.
+- A section can also have a `list`, a `thumbnail`, and an `external` link.
+- To show a page in the sidebar, search, and previous/next links, add it to
+  `navigation` in [`src/lib/navigation.ts`](src/lib/navigation.ts). The page
+  order follows that list.
+- Code block languages: `btsx`, `tsrx`, `ts`/`tsx`/`js`, `css`, `json`,
+  `html`/`xml`, and `bash`/`sh`. Use `text` for no highlighting.
 
-## Selected stack
+The version shown in the sidebar, hero, and footer comes from the latest GitHub
+release of `phtn/beast`. It falls back to the `package.json` version if that
+request fails.
 
-- Bundler: rspack
-- UI: radix (@octanejs/radix)
-- Styling: Tailwind CSS v4
+## Bundle and code splitting
 
-```ts
-import { Dialog, Separator } from "@octanejs/radix";
-```
+The production build is split so that visitors download only what their page
+needs:
+
+| Chunk        | Contents                                              | Loaded           |
+| ------------ | ----------------------------------------------------- | ---------------- |
+| `main`       | Mount and router                                      | Always           |
+| `framework`  | `octane` runtime                                      | Always           |
+| (shared)     | Site shell: header, sidebar, search, icons, footer    | Always           |
+| `home`       | Landing page                                          | On `/`           |
+| `docs`       | Docs renderer and all page content                    | On `/docs/*`     |
+| `highlight`  | highlight.js and the BTSX/TSRX grammars               | After first paint |
+
+- `Root.btsx` lazy-loads each page with Octane's `lazy` and `Suspense`. `Link`
+  preloads the target page's chunk on hover or focus.
+- Code blocks render as plain text first and are highlighted once the
+  `highlight` chunk arrives.
+- Every file name carries a content hash, so `framework` stays cached across
+  content-only deploys.
+- Shell components import from `lib/navigation.ts`, not `lib/docs.ts`. Keep it
+  that way, or all the docs content moves back into the initial load.
+
+The build has no size warnings. `framework` is about 220 KiB minified (68 KiB
+gzipped), under Rspack's 300 KiB limit. The site uses its own router instead
+of `@octanejs/tanstack-router`, which added about 135 KiB. If you need nested
+layouts, loaders, or search-param state later, that's the trade-off to revisit.
+
+## Deployment
+
+`bun run build` writes a static single-page app to `dist/`. Configure the host
+to serve `index.html` for unknown paths so deep links like `/docs/language`
+work. Assets are requested from `/`, so deploy the site at the domain root.
+
+## BTSX gotchas
+
+A few things came up while building this site:
+
+- **Setup can't `await`.** Load async data in `useEffect` or through a hook (see
+  `useBeastRelease` in `src/lib/release.ts`).
+- **Don't use a bare text line as the whole `if`/`else` branch inside `each`.**
+  Octane renders a lone `| #{text}` there as nothing. Wrap it in an element
+  (`span #{text}`) or use a ternary.
+- **Use `Link` for internal pages.** `src/components/link.btsx` takes `to` and
+  navigates without a full page load. For external URLs, use a plain `a`.
+- **Use `onInput` for text fields.** In Octane, `onChange` fires on commit, not
+  on every keystroke.
+
+Record notable changes in [CHANGELOG.md](CHANGELOG.md).

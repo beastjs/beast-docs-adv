@@ -6,13 +6,13 @@
   "scripts": {
     "dev": "rspack serve --mode development",
     "build": "rspack build --mode production",
+    "size": "bun scripts/size.ts",
+    "build:size": "bun run build && bun run size",
     "preview": "rspack serve --mode production",
     "typecheck": "tsrx-tsc --noEmit",
     "check": "bun run typecheck && bun run build"
   },
   "dependencies": {
-    "@octanejs/radix": "0.1.52",
-    "@octanejs/tanstack-router": "^0.1.53",
     "beast-tsrx": "latest",
     "clsx": "^2.1.1",
     "highlight.js": "^11.12.0",

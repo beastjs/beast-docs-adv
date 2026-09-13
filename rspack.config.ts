@@ -5,7 +5,45 @@ import { fileURLToPath } from 'node:url'
 const srcDir = fileURLToPath(new URL('./src', import.meta.url))
 const config: Configuration = {
   entry: './src/main.ts',
-  output: { publicPath: '/' },
+  output: {
+    publicPath: '/',
+    filename: '[name].[contenthash:8].js',
+    chunkFilename: '[name].[contenthash:8].js',
+    cssFilename: '[name].[contenthash:8].css',
+    cssChunkFilename: '[name].[contenthash:8].css'
+  },
+  optimization: {
+    splitChunks: {
+      chunks: 'all',
+      cacheGroups: {
+        // The Octane runtime changes rarely; keep it in a long-lived chunk.
+        framework: {
+          test: /[\\/]node_modules[\\/](octane|@octanejs)[\\/]/u,
+          name: 'framework',
+          priority: 20
+        },
+        highlight: {
+          test: /[\\/](node_modules[\\/]highlight\.js|src[\\/]lib[\\/]btsx-hljs)/u,
+          name: 'highlight',
+          chunks: 'async',
+          priority: 30
+        }
+      }
+    }
+  },
+  // Always list emitted assets with their sizes, not only when over budget.
+  stats: {
+    preset: 'errors-warnings',
+    assets: true,
+    assetsSort: '!size',
+    cachedAssets: true,
+    assetsSpace: 50,
+    groupAssetsByEmitStatus: false,
+    groupAssetsByInfo: false,
+    groupAssetsByPath: false,
+    groupAssetsByExtension: false,
+    groupAssetsByChunk: false
+  },
   experiments: { css: true },
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.btsx', '.mdx'],

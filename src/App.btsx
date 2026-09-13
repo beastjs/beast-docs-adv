@@ -1,5 +1,5 @@
 import { Icon } from "@/lib/icons";
-import {Link} from "@octanejs/tanstack-router";
+import Link from "./components/link.btsx";
 import BeastAudio  from "./components/beast-audio.btsx";
 import CompilerShowcase  from "./components/compiler-showcase.btsx";
 import CopyButton  from "./components/copy-button.btsx";
@@ -7,7 +7,7 @@ import CornerMarks  from "./components/corner-marks.btsx";
 import Sidebar  from "./components/sidebar.btsx";
 import SiteFooter  from "./components/site-footer.btsx";
 import SiteHeader from "./components/site-header.btsx";
-import { githubUrl } from "./lib/docs";
+import { githubUrl } from "./lib/navigation";
 import { getProjectStatus } from './lib/status'
 import { useBeastRelease } from './lib/release'
 

@@ -1,4 +1,5 @@
-import hljs from "@/lib/btsx-hljs";
+import type { HLJSApi } from "highlight.js";
+import { useEffect, useState } from "octane";
 import CopyButton from "./copy-button.btsx";
 module
   type CodeBlockProps = {
@@ -7,9 +8,17 @@ module
     ~ language?: string;
     ~ className?: string;
     ~ };
+
+  // highlight.js (plus the custom BTSX/TSRX grammars) is loaded on demand so it
+  // stays out of the initial bundle. Code renders as plain text until it arrives.
+  let hljsPromise: Promise<HLJSApi> | undefined;
+  function loadHighlighter() {
+    hljsPromise ??= import("@/lib/btsx-hljs").then((module) => module.default);
+    return hljsPromise;
+  }
+
   // Map docs language ids to highlight.js ids
-  // Map docs language ids to highlight.js ids
-  function normalizeLang(lang?: string): string | undefined {
+  function normalizeLang(hljs: HLJSApi, lang?: string): string | undefined {
     if (!lang)
       return undefined;
     const l = lang.toLowerCase();
@@ -24,29 +33,38 @@ module
     // highlight.js uses "typescript" for ts, "javascript" for js
     if (["ts", "typescript", "tsx", "js", "javascript", "css", "json", "html", "xml"].includes(l))
       return l;
-    // fallback: let hljs auto-detect or plain
     return hljs.getLanguage(l) ? l : undefined;
+  }
+
+  function highlight(hljs: HLJSApi, code: string, language?: string): string | null {
+    const lang = normalizeLang(hljs, language);
+    if (!lang)
+      return null;
+    try {
+      return hljs.getLanguage(lang)
+        ? hljs.highlight(code, { language: lang }).value
+        : hljs.highlightAuto(code).value;
+    }
+    catch {
+      return null;
+    }
   }
 component CodeBlockRoot
   props { code, filename, language, className = "" }: CodeBlockProps
   setup
-    const lang = normalizeLang(language);
-    let highlighted: string | null = null;
+    const [highlighted, setHighlighted] = useState<string | null>(null);
 
-    try {
-      if (lang && hljs.getLanguage(lang)) {
-        highlighted = hljs.highlight(code, { language: lang }).value;
-      }
-      else if (lang === undefined) {
-        highlighted = null;
-      }
-      else {
-        highlighted = hljs.highlightAuto(code).value;
-      }
-    }
-    catch {
-      highlighted = null;
-    }
+    useEffect(() => {
+      let active = true;
+      setHighlighted(null);
+      loadHighlighter().then((hljs) => {
+        if (active)
+          setHighlighted(highlight(hljs, code, language));
+      });
+      return () => {
+        active = false;
+      };
+    }, [code, language]);
 
     const lines = highlighted ? highlighted.split("\n") : null;
   div(suppressHydrationWarning className={`code-block ${className}`.trim()})

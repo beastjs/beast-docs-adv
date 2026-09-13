@@ -1,6 +1,6 @@
 import { Icon } from "@/lib/icons";
-import { Link } from "@octanejs/tanstack-router";
-import { githubUrl } from "../lib/docs";
+import Link from "./link.btsx";
+import { githubUrl } from "../lib/navigation";
 import Brand from "./brand.btsx";
 import MobileNav from "./mobile-nav.btsx";
 import Search from "./search.btsx";
@@ -63,7 +63,6 @@ component SiteHeaderRoot
             else
               Link(
                 ~ to={item.href}
-                ~ activeOptions={{ exact: true }}
                 ~ className={section === item.section ? "active" : undefined}
                 ~ aria-current={section === item.section ? "page" : undefined}
                 ~ )

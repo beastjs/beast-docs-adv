@@ -1,5 +1,5 @@
 import { Icon } from "@/lib/icons";
-import {Link} from "@octanejs/tanstack-router";
+import Link from "./link.btsx";
 module
   type BrandProps = {
     ~ compact?: boolean;
