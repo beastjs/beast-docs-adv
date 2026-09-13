@@ -1,26 +1,24 @@
 import { useEffect, useState } from 'octane'
-import packageJson from '../../package.json'
-
-type GitHubRelease = {
-  tag_name?: string
-}
 
 export type BeastRelease = {
   version: string
-  source: 'github' | 'package'
+  source: 'npm' | 'build'
 }
 
-const githubReleasesUrl = 'https://api.github.com/repos/phtn/beast/releases/latest'
-const fallbackVersion = `v${packageJson.version}`
+// Beast ships as `beast-tsrx` on npm (and `bun create beast@latest` installs
+// it), so the registry's `latest` dist-tag is the current version. The GitHub
+// repo has no Releases and its tags lag behind npm, so it isn't used.
+const npmLatestUrl = 'https://registry.npmjs.org/beast-tsrx/latest'
 
+// Injected by rspack.config.ts from the installed beast-tsrx package, so the
+// first render (and any offline visit) shows a real version.
 export const fallbackRelease: BeastRelease = {
-  version: fallbackVersion,
-  source: 'package'
+  version: formatVersion(__BEAST_VERSION__),
+  source: 'build'
 }
 
-function normalizeVersion(tagName?: string) {
-  if (!tagName) return fallbackVersion
-  return tagName.startsWith('v') ? tagName : `v${tagName}`
+function formatVersion(version: string) {
+  return version.startsWith('v') ? version : `v${version}`
 }
 
 let releasePromise: Promise<BeastRelease> | undefined
@@ -28,20 +26,17 @@ let releasePromise: Promise<BeastRelease> | undefined
 export function getBeastRelease(): Promise<BeastRelease> {
   releasePromise ??= (async () => {
     try {
-      const response = await fetch(githubReleasesUrl, {
-        headers: { Accept: 'application/vnd.github+json' }
-      })
-
+      const response = await fetch(npmLatestUrl, { headers: { Accept: 'application/json' } })
       if (!response.ok) {
-        throw new Error(`GitHub releases request failed with ${response.status}`)
+        throw new Error(`npm registry request failed with ${response.status}`)
       }
 
-      const release = (await response.json()) as GitHubRelease
-
-      return {
-        version: normalizeVersion(release.tag_name),
-        source: 'github' as const
+      const { version } = (await response.json()) as { version?: unknown }
+      if (typeof version !== 'string' || !version) {
+        throw new Error('npm registry response has no version')
       }
+
+      return { version: formatVersion(version), source: 'npm' as const }
     } catch {
       return fallbackRelease
     }

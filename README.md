@@ -91,9 +91,11 @@ Documentation content is data, not markup. Every page lives in `docPages` in
 - Code block languages: `btsx`, `tsrx`, `ts`/`tsx`/`js`, `css`, `json`,
   `html`/`xml`, and `bash`/`sh`. Use `text` for no highlighting.
 
-The version shown in the sidebar, hero, and footer comes from the latest GitHub
-release of `phtn/beast`. It falls back to the `package.json` version if that
-request fails.
+The Beast version shown in the hero, sidebar, footer, and status panel is the
+`latest` version of `beast-tsrx` on npm, fetched in the browser. Until that
+loads, or if it fails, the site shows the `beast-tsrx` version installed at
+build time (injected as `__BEAST_VERSION__`). GitHub isn't used: the repo has
+no Releases and its tags are behind npm.
 
 ## Bundle and code splitting
 

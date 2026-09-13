@@ -1,12 +1,18 @@
-import { HtmlRspackPlugin, type Configuration } from '@rspack/core'
+import { DefinePlugin, HtmlRspackPlugin, type Configuration } from '@rspack/core'
 import { beastOctane } from 'beast-tsrx/rspack'
+import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
 const srcDir = fileURLToPath(new URL('./src', import.meta.url))
+// The installed Beast version, used until the live npm version loads.
+const beastVersion: string = JSON.parse(
+  readFileSync(new URL('./node_modules/beast-tsrx/package.json', import.meta.url), 'utf8')
+).version
 const config: Configuration = {
   entry: './src/main.ts',
   output: {
     publicPath: '/',
+    clean: true,
     filename: '[name].[contenthash:8].js',
     chunkFilename: '[name].[contenthash:8].js',
     cssFilename: '[name].[contenthash:8].css',
@@ -58,7 +64,11 @@ const config: Configuration = {
     }
   },
   module: { rules: [{ test: /\.css$/u, type: 'css', use: ['postcss-loader'] }] },
-  plugins: [new HtmlRspackPlugin({ template: './index.html' }), beastOctane()],
+  plugins: [
+    new HtmlRspackPlugin({ template: './index.html' }),
+    new DefinePlugin({ __BEAST_VERSION__: JSON.stringify(beastVersion) }),
+    beastOctane()
+  ],
   devServer: { historyApiFallback: true }
 }
 

@@ -3,6 +3,6 @@ export function getProjectStatus(version: string) {
  │ source   .btsx     │
  │ output   .tsrx     │
  │ runtime  octane    │
- │ status   ${version}    │
+ │ status   ${version.padEnd(10).slice(0, 10)}│
  └────────────────────┘`
 }
