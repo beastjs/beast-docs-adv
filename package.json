@@ -9,6 +9,7 @@
     "size": "bun scripts/size.ts",
     "build:size": "bun run build && bun run size",
     "preview": "rspack serve --mode production",
+    "deploy": "bun run build && bunx wrangler deploy",
     "typecheck": "tsrx-tsc --noEmit",
     "check": "bun run typecheck && bun run build"
   },

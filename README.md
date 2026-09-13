@@ -23,6 +23,7 @@ The dev server runs at <http://localhost:8080>.
 | `bun run size`      | Print raw, gzip, and brotli sizes of `dist/`         |
 | `bun run build:size`| Build, then print sizes                              |
 | `bun run preview`   | Serve a production-mode build locally                |
+| `bun run deploy`    | Build and deploy to Cloudflare with Wrangler         |
 | `bun run typecheck` | Type-check `.ts` sources with `tsrx-tsc`             |
 | `bun run check`     | `typecheck` followed by `build`                      |
 
@@ -41,7 +42,8 @@ The dev server runs at <http://localhost:8080>.
 ```text
 index.html                 HTML shell, font links, favicon
 rspack.config.ts           Bundler config, output hashing, chunk splitting
-public/                    Static files served from the site root
+wrangler.jsonc             Cloudflare Workers static-assets config
+public/                    Static files copied to the site root (icons, _headers)
 src/
   main.ts                  App mount
   Root.btsx                Picks the page for the current path, lazy-loaded
@@ -127,9 +129,25 @@ layouts, loaders, or search-param state later, that's the trade-off to revisit.
 
 ## Deployment
 
-`bun run build` writes a static single-page app to `dist/`. Configure the host
-to serve `index.html` for unknown paths so deep links like `/docs/language`
-work. Assets are requested from `/`, so deploy the site at the domain root.
+The site deploys to Cloudflare Workers as static assets, configured in
+[`wrangler.jsonc`](wrangler.jsonc):
+
+- `assets.directory` is `./dist`, so only the build output is uploaded.
+- `not_found_handling: "single-page-application"` serves `index.html` for
+  client-side routes like `/docs/language`.
+- `public/_headers` is copied into `dist/` and marks the content-hashed JS and
+  CSS as immutable.
+
+In the Cloudflare dashboard, use:
+
+| Setting        | Value                |
+| -------------- | -------------------- |
+| Build command  | `bun run build`      |
+| Deploy command | `npx wrangler deploy` |
+
+To deploy from your machine, run `bun run deploy`. Everything in `public/` is
+copied to the site root on build. Assets are requested from `/`, so deploy the
+site at the domain root.
 
 ## BTSX gotchas
 

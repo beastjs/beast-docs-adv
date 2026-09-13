@@ -1,4 +1,4 @@
-import { DefinePlugin, HtmlRspackPlugin, type Configuration } from '@rspack/core'
+import { CopyRspackPlugin, DefinePlugin, HtmlRspackPlugin, type Configuration } from '@rspack/core'
 import { beastOctane } from 'beast-tsrx/rspack'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
@@ -66,6 +66,8 @@ const config: Configuration = {
   module: { rules: [{ test: /\.css$/u, type: 'css', use: ['postcss-loader'] }] },
   plugins: [
     new HtmlRspackPlugin({ template: './index.html' }),
+    // Static files (icons, _headers for Cloudflare) are served from the site root.
+    new CopyRspackPlugin({ patterns: [{ from: 'public' }] }),
     new DefinePlugin({ __BEAST_VERSION__: JSON.stringify(beastVersion) }),
     beastOctane()
   ],

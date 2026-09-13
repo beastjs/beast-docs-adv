@@ -1,0 +1,12 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "beast-docs",
+  "compatibility_date": "2026-09-13",
+  // Static single-page app: no Worker script, just the Rspack build output.
+  // Without this, Wrangler uploads the whole repo (including node_modules).
+  "assets": {
+    "directory": "./dist",
+    // Serve index.html for client-side routes like /docs/language.
+    "not_found_handling": "single-page-application"
+  }
+}
