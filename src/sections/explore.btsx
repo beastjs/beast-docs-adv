@@ -1,0 +1,74 @@
+import {Icon, type IconName} from "../lib/icons";
+import CornerMarks from "../components/corner-marks.btsx";
+import Link from "../components/link.btsx";
+
+module
+
+  interface DocsCard {
+    eyebrow: string
+    title: string
+    description: string
+    href: string
+    icon: IconName
+  }
+  const docsCards: DocsCard[] = [
+    {
+      eyebrow: "Start here",
+      title: "Create your first Beast app",
+      description: "Choose Vite, Rspack, or Rsbuild plus an Octane-native UI library.",
+      href: "/docs/get-started",
+      icon: "sparkle"
+    },
+    {
+      eyebrow: "Language",
+      title: "Elements and nesting",
+      description: "Learn selectors, attributes, text, interpolation, and roots.",
+      href: "/docs/language",
+      icon: "scan-text"
+    },
+    {
+      eyebrow: "Skills",
+      title: "Migrate React to Beast",
+      description: "Audit and port complete React applications while preserving behavior and routes.",
+      href: "/docs/react-to-beast",
+      icon: "git-branch"
+    },
+    {
+      eyebrow: "Tooling",
+      title: "CLI reference",
+      description: "Compile components and build mixed BTSX and TSRX source trees.",
+      href: "/docs/cli",
+      icon: "terminal-sq"
+    },
+    {
+      eyebrow: "Integrations",
+      title: "Bundler integrations",
+      description: "Connect Beast and Octane to Vite, Rspack, or Rsbuild.",
+      href: "/docs/vite",
+      icon: "plugin"
+    },
+    {
+      eyebrow: "Examples",
+      title: "BTSX to TSRX examples",
+      description: "Compare tested Beast source with the readable TSRX it generates.",
+      href: "/docs/examples",
+      icon: "code"
+    }
+  ]
+
+section.section(aria-labelledby="explore-title")
+  .section-heading
+    span.section-kicker Explore the docs
+    h2#explore-title Everything you need to build and migrate
+    p Learn the language, equip your agent, use the tooling, connect integrations, and explore tested examples.
+  .docs-card-grid
+    CornerMarks
+    each card in docsCards key card.href
+      Link(className="docs-card" to={card.href})
+        .docs-card-top
+          span(className="feature-icon neutral")
+            Icon(name={card.icon} size={16} aria-hidden="true")
+          Icon(name="arrow-right" className="card-arrow" size={15} aria-hidden="true")
+        span.docs-card-kicker #{card.eyebrow}
+        h3 #{card.title}
+        p #{card.description}

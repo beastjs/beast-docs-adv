@@ -1,0 +1,49 @@
+import { AnimatePresence, motion, useReducedMotion } from "@octanejs/motion";
+import { useRef, type ClassValue } from "octane";
+import { Icon, type IconName } from "@/lib/icons";
+import { cn } from "@/lib/utils";
+
+module
+  const MotionSpan = motion.span;
+  const ICON_TRANSITION = { bounce: 0, duration: 0.3, type: "spring" as const };
+  const ICON_HIDDEN = { filter: "blur(4px)", opacity: 0, scale: 0.25 } as const;
+  const ICON_VISIBLE = { filter: "blur(0px)", opacity: 1, scale: 1 } as const;
+  // Incoming icon zooms in from small; outgoing icon zooms out past full size.
+  const ICON_EXIT = { filter: "blur(4px)", opacity: 0, scale: 0.25 } as const;
+  // Reduced motion keeps a short crossfade instead of the blur/scale swap.
+  const REDUCED_TRANSITION = { duration: 0.15, ease: "linear" as const };
+  const REDUCED_HIDDEN = { opacity: 0 } as const;
+  const REDUCED_VISIBLE = { opacity: 1 } as const;
+  interface AnimatedIconProps {
+    ~ active: boolean;
+    ~ activeIcon: IconName;
+    ~ idleIcon: IconName;
+    ~ className?: ClassValue;
+    ~ wrapperClassName?: ClassValue;
+    ~ }
+
+props { active, activeIcon, idleIcon, className, wrapperClassName }: AnimatedIconProps
+setup
+  const shouldReduceMotion = useReducedMotion();
+  // octane's AnimatePresence ignores `initial={false}`, so skip the enter
+  // animation ourselves until `active` first changes from its mount value.
+  const initialActive = useRef(active);
+  const hasToggled = useRef(false);
+  hasToggled.current ||= active !== initialActive.current;
+  const icon = active ? activeIcon : idleIcon;
+  const hidden = shouldReduceMotion ? REDUCED_HIDDEN : ICON_HIDDEN;
+  const visible = shouldReduceMotion ? REDUCED_VISIBLE : ICON_VISIBLE;
+  const exit = shouldReduceMotion ? REDUCED_HIDDEN : ICON_EXIT;
+  // Exiting icons are cloned with position:absolute into this wrapper, so it
+  // must be the positioned ancestor for the swap to overlap in place.
+span(className={cn("relative inline-flex items-center justify-center", wrapperClassName)} aria-hidden="true")
+  AnimatePresence(initial={false} mode="popLayout")
+    MotionSpan(
+      ~ key={icon}
+      ~ className="flex will-change-[transform,opacity,filter]"
+      ~ initial={hasToggled.current ? hidden : false}
+      ~ animate={visible}
+      ~ exit={exit}
+      ~ transition={shouldReduceMotion ? REDUCED_TRANSITION : ICON_TRANSITION}
+      ~ )
+      Icon(name={icon} className={className})

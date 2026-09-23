@@ -1,0 +1,59 @@
+import { DocSection } from '@/lib/docs';
+import { Icon } from "@/lib/icons";
+import Codeblocks from "../components/codeblocks.btsx";
+module
+  type Props = {
+    section: DocSection
+  };
+component InlineText
+  props { text }: { text: string }
+  each part, index in text.split(/(`[^`]+`)/g).filter(Boolean) key `${index}-${part}`
+    if part.startsWith("`") && part.endsWith("`")
+      code #{part.slice(1, -1)}
+    else
+      span #{part}
+component Thumbnail
+  props { src, label = "thumbnail" }: { src: string; label?: string }
+  img(src={src} alt={label} width={400} height={400} className="size-12 aspect-auto -mt-4")
+component ExternalLink
+  props { label, href }: { label?: string; href: string }
+  a(href={href} target="_blank" rel="noreferrer" className="flex items-center space-x-1 text-sm")
+    span(className="text-blue-500 dark:text-blue-400") #{label ?? href}
+    Icon(name="arrow-up-right" size={12} className="text-blue-500 animate-bounce")
+props {section}: Props
+section.article-section(id={section.id})
+  div(className="flex items-center space-x-6")
+    if section.thumbnail
+      Thumbnail({...section.thumbnail})
+    h2
+      a(href={`#${section.id}`}) #{section.title}
+  each paragraph in section.paragraphs ?? [] key paragraph
+    p
+      InlineText(text={paragraph})
+  if section.external
+    ExternalLink({...section.external})
+  if section.list
+    ul.article-list
+      each item in section.list key item
+        li
+          InlineText(text={item})
+  if section.code
+    Codeblocks({...section.code})
+  if section.table
+    .table-wrap
+      table
+        thead
+          tr
+            each header in section.table.headers key header
+              th #{header}
+        tbody
+          each row in section.table.rows key row.join("-")
+            tr
+              each cell, index in row key `${cell}-${index}`
+                td
+                  InlineText(text={cell})
+  if section.note
+    aside(className={`article-note ${section.note.tone === "warning" ? "warning" : "info"}`})
+      strong #{section.note.title}
+      p
+        InlineText(text={section.note.body})

@@ -1,0 +1,27 @@
+import CornerMarks from "../components/corner-marks.btsx";
+import {Icon} from "../lib/icons";
+import { getProjectStatus } from "@/lib/status";
+
+module
+  type Props = {
+    release: { version: string };
+    githubUrl: string;
+  }
+props {release, githubUrl}: Props
+section(className="section status-section" aria-labelledby="status-title")
+  .status-panel
+    CornerMarks
+    .status-copy
+      span.section-kicker Project status
+      h2#status-title Early, focused, and tested
+      p Beast #{release.version} is alpha software with a deliberately narrow language. The compiler, project builder, bundler integrations, and creator work today; the public API may still evolve.
+      a(
+        ~ className="button button-secondary"
+        ~ href={`${githubUrl}#project-status`}
+        ~ target="_blank"
+        ~ rel="noreferrer"
+        ~ )
+        | Read project status
+        Icon(name="arrow-right" size={15} aria-hidden="true")
+    .status-ascii(aria-hidden="true")
+      pre #{getProjectStatus(release.version)}

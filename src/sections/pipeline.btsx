@@ -1,0 +1,37 @@
+
+import {Icon, type IconName} from "../lib/icons";
+import Link from "../components/link.btsx";
+import CornerMarks from "../components/corner-marks.btsx";
+
+module
+
+  interface PipelineStep {
+      label: string
+      caption: string
+      icon: IconName
+    }
+  const pipeline: PipelineStep[] = [
+    { label: ".btsx", caption: "Source", icon: "beast" },
+    { label: "Parser", caption: "Indentation", icon: "scan-text" },
+    { label: "Beast AST", caption: "Source-located", icon: "ast" },
+    { label: ".tsrx", caption: "Readable output", icon: "code" },
+    { label: "Octane", caption: "Validation", icon: "octane" },
+    { label: "Bundler", caption: "Vite / Rspack / Rsbuild", icon: "rsbuild" }
+  ]
+
+section.section(aria-labelledby="pipeline-title")
+  div(className="section-heading-row pipeline-heading")
+    div
+      span.section-kicker How it works
+      h2#pipeline-title From source to browser
+    Link(className="text-link" to="/docs/how-it-works")
+      | Follow the pipeline
+      Icon(name="arrow-right" size={14} aria-hidden="true")
+  .pipeline
+    CornerMarks
+    each step, index in pipeline key step.label
+      .pipeline-step
+        span.pipeline-index #{String(index + 1).padStart(2, "0")}
+        Icon(name={step.icon} size={18} aria-hidden="true")
+        strong #{step.label}
+        small #{step.caption}

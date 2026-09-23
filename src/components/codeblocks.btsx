@@ -73,7 +73,7 @@ component CodeBlockRoot
       span.code-header-actions
         if language
           span.code-language #{language}
-        CopyButton(value={code} compact)
+        CopyButton(value={code} compact className='min-w-[2rem]! rounded-sm!')
     pre
       code(suppressHydrationWarning)
         if lines

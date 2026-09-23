@@ -1,6 +1,26 @@
 {
   "version": "0.0.1",
   "configurations": [
-    { "name": "dev", "runtimeExecutable": "bun", "runtimeArgs": ["run", "dev"], "port": 8080 }
+    {
+      "name": "dev",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
+      "port": 8080
+    },
+    {
+      "name": "dist",
+      "runtimeExecutable": "bunx",
+      "runtimeArgs": [
+        "serve",
+        "-s",
+        "dist",
+        "-l",
+        "4173"
+      ],
+      "port": 4173
+    }
   ]
 }

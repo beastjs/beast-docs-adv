@@ -1,0 +1,8 @@
+import CompilerShowcase from "../components/compiler-showcase.btsx";
+
+section.section(aria-labelledby="compiler-title")
+  .section-heading
+    span(className="section-kicker opacity-80") The compiler
+    h2#compiler-title Small syntax. Native output.
+    p Beast stays deliberately narrow: it makes templates compact, then gets out of the toolchain's way.
+  CompilerShowcase

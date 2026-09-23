@@ -14,6 +14,7 @@
     "check": "bun run typecheck && bun run build"
   },
   "dependencies": {
+    "@octanejs/motion": "^0.1.54",
     "beast-tsrx": "latest",
     "clsx": "^2.1.1",
     "highlight.js": "^11.12.0",

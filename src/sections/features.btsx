@@ -1,0 +1,51 @@
+import {Icon, type IconName} from "../lib/icons";
+import CornerMarks from "../components/corner-marks.btsx";
+
+module
+  interface Feature {
+    title: string
+    description: string
+    icon: IconName
+    color: string
+  }
+
+  const features: Feature[] = [
+    {
+      title: "Indentation-first",
+      description: "Write a component tree without closing tags. Spaces define structure and diagnostics point back to your source.",
+      icon: "indent-plus",
+      color: "blue"
+    },
+    {
+      title: "Native control flow",
+      description: "Conditions, keyed loops, switches, pending states, and catches compile to Octane operations.",
+      icon: "braces",
+      color: "green"
+    },
+    {
+      title: "Types stay intact",
+      description: "Props, imports, setup code, and embedded expressions remain TypeScript source for final validation.",
+      icon: "shield-check",
+      color: "violet"
+    },
+    {
+      title: "Bring your bundler",
+      description: "Use Vite, Rspack, or Rsbuild with Octane, including HMR, SSR transforms, and production builds.",
+      icon: "zap",
+      color: "orange"
+    }
+  ]
+
+section.section(aria-labelledby="features-title")
+  .section-heading
+    span.section-kicker Why Beast
+    h2#features-title Built to remain transparent
+    p Every layer is explicit—from the source you author to the TSRX Octane receives.
+  .feature-grid
+    CornerMarks
+    each feature in features key feature.title
+      article.feature-card
+        span(className={`feature-icon`})
+          Icon(name={feature.icon} size={17} aria-hidden="true")
+        h3 #{feature.title}
+        p #{feature.description}

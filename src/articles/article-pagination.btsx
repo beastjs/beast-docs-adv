@@ -1,0 +1,26 @@
+import { type DocPage } from "@/lib/docs";
+import Link from "../components/link.btsx";
+import { Icon } from "@/lib/icons";
+module
+  type Props = {
+    previous: DocPage | undefined
+    next: DocPage | undefined
+  }
+props {previous, next}: Props
+nav.article-pagination(aria-label="Documentation pages")
+  if previous
+    Link(to={`/docs${previous.slug ? `/${previous.slug}` : ""}`})
+      Icon(name="arrow-right" size={15} className="rotate-180" aria-hidden="true")
+      span
+        small Previous
+        strong #{previous.title}
+  else
+    span
+  if next
+    Link(to={`/docs/${next.slug}`} className="next-page")
+      span
+        small Next
+        strong #{next.title}
+      Icon(name="arrow-right" size={15} aria-hidden="true")
+  else
+    span

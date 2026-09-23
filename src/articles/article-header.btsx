@@ -1,0 +1,21 @@
+import {Icon} from "../lib/icons";
+module
+  type Props = {
+    page: DocPage
+    githubUrl: string
+  }
+import { DocPage } from "@/lib/docs";
+props {page, githubUrl}: Props
+header.article-header
+  span.section-kicker #{page.eyebrow}
+  h1 #{page.title}
+  p #{page.description}
+  .article-actions
+    a.article-action(
+      ~ href={`${githubUrl}/blob/main/README.md`}
+      ~ target="_blank"
+      ~ rel="noreferrer"
+      ~ )
+      Icon(name="github" className="size-3.5")
+      span(className="font-mono font-normal") source
+      Icon(name="arrow-up-right" size={12} aria-hidden="true")

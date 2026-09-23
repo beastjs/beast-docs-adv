@@ -1107,7 +1107,6 @@ a {
   align-items: center;
   justify-content: center;
   border: 0;
-  border-left: 1px solid var(--border);
   background: transparent;
   color: var(--muted-foreground);
   padding: 0;
@@ -1332,6 +1331,7 @@ a {
   width: 2.55rem;
   flex: 0 0 2.55rem;
   color: var(--code-muted);
+  opacity: 0.4;
   padding-right: 0.8rem;
   text-align: right;
   user-select: none;
@@ -1965,7 +1965,8 @@ a {
     color 130ms ease;
 }
 
-.article-toc nav a:hover {
+.article-toc nav a:hover,
+.article-toc nav a.is-visible {
   border-left-color: var(--accent);
   color: var(--foreground);
 }

@@ -1,14 +1,17 @@
 module "use client";
-import { useRef, useState } from "octane";
+import { useRef, useState, type ClassValue } from "octane";
 import { Icon } from "@/lib/icons";
+import { cn } from "@/lib/utils";
+import AnimatedIcon from "./animated-icon.btsx";
 module
   type CopyButtonProps = {
     ~ value: string;
     ~ label?: string;
     ~ compact?: boolean;
+    ~ className?: ClassValue;
     ~ };
 component CopyButtonRoot
-  props { value, label = "Copy", compact = false, }: CopyButtonProps
+  props { value, label = "Copy", compact = false, className }: CopyButtonProps
   setup
     const [copied, setCopied] = useState(false);
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -27,12 +30,12 @@ component CopyButtonRoot
     }
   button(
     ~ type="button"
-    ~ className='copy-button'
+    ~ className={cn('copy-button overflow-hidden', className)}
     ~ onClick={copy}
     ~ aria-label={copied ? "Copied" : label}
     ~ title={copied ? "Copied" : label}
     ~ )
-    Icon(name={copied ? 'check' : 'copy'} className='size-4.5' aria-hidden="true")
+    AnimatedIcon(idleIcon='copy' activeIcon='copied' active={copied} className={cn('size-4.5', {'text-white': copied})})
     if !(compact)
       span #{copied ? "Copied" : label}
 

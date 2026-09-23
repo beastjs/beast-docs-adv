@@ -1,0 +1,37 @@
+import Link from "../components/link.btsx";
+import {Icon} from "../lib/icons";
+
+module
+  type HeroProps = {
+    release: { version: string };
+    githubUrl: string;
+  };
+props { release, githubUrl }: HeroProps
+section.hero(aria-labelledby="hero-title")
+  .hero-kicker
+    span.pulse-dot(aria-hidden="true")
+    span #{release.version} · Alpha
+  h1#hero-title Beast Developer Docs
+  p Build apps fast. Even faster with machines.
+  .hero-actions
+    Link(to="/docs/get-started" className="button button-primary")
+      | Get started
+      Icon(name="arrow-right" size={15} aria-hidden="true")
+    a(className="button button-secondary" href={githubUrl} target="_blank" rel="noreferrer") View on GitHub
+  .hero-meta(aria-label="Built with")
+    span BTSX
+    i(aria-hidden="true")
+    a(href="https://tsrx.dev/" target="_blank" rel="noreferrer")
+      span(className='text-[#863eff]') TSRX
+    i(aria-hidden="true")
+    a(href="https://octanejs.dev/" target="_blank" rel="noreferrer")
+      span(className='text-[#ff415a]') Octane
+    i(aria-hidden="true")
+    a(href="https://vite.dev/" target="_blank" rel="noreferrer")
+      span(className='') Vite
+    i(aria-hidden="true")
+    a(href="https://rspack.rs/" target="_blank" rel="noreferrer")
+      span(className='') Rspack
+    i(aria-hidden="true")
+    a(href="https://rsbuild.rs/" target="_blank" rel="noreferrer")
+      span(className='text-[#ff8b00]') Rsbuild
