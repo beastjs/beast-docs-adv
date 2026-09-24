@@ -137,6 +137,12 @@ export const navigation: NavigationSection[] = [
     label: 'Resources',
     items: [
       {
+        label: 'Beast Playground',
+        href: `https://playground.beastjs.workers.dev`,
+        description: 'Convert TSX to BTSX to TSRX.',
+        external: true
+      },
+      {
         label: 'Octane coverage',
         href: `${githubUrl}/blob/main/docs/octane-coverage.md`,
         description: 'See supported runtime APIs and roadmap.',
