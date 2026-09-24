@@ -35,7 +35,7 @@ component CopyButtonRoot
     ~ aria-label={copied ? "Copied" : label}
     ~ title={copied ? "Copied" : label}
     ~ )
-    AnimatedIcon(idleIcon='copy' activeIcon='copied' active={copied} className={cn('size-4.5', {'text-white': copied})})
+    AnimatedIcon(idleIcon='copy' activeIcon='copied' active={copied} className={cn('size-4', {'text-white': copied})})
     if !(compact)
       span #{copied ? "Copied" : label}
 
