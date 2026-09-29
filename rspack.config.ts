@@ -1,3 +1,4 @@
+import { beastDevtools } from '@beastjs/devtools/rspack'
 import { CopyRspackPlugin, DefinePlugin, HtmlRspackPlugin, type Configuration } from '@rspack/core'
 import { beastOctane } from 'beast-tsrx/rspack'
 import { readFileSync } from 'node:fs'
@@ -69,7 +70,8 @@ const config: Configuration = {
     // Static files (icons, _headers for Cloudflare) are served from the site root.
     new CopyRspackPlugin({ patterns: [{ from: 'public' }] }),
     new DefinePlugin({ __BEAST_VERSION__: JSON.stringify(beastVersion) }),
-    beastOctane()
+    beastOctane({ octane: { profile: true } }),
+    beastDevtools({})
   ],
   devServer: { historyApiFallback: true }
 }

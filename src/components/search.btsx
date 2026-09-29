@@ -2,7 +2,7 @@ module "use client";
 import { Icon } from "@/lib/icons";
 import Link from "./link.btsx";
 import { searchItems } from "../lib/navigation";
-import { useEffect, useMemo, useRef, useState } from "octane";
+import { useEffect, useMemo, useRef, useState, Ref, RefObject } from "octane";
 
 component SearchResultContent
   props { item }: { item: (typeof searchItems)[number] }
@@ -16,10 +16,121 @@ component SearchResultContent
     span.search-result-meta
       span #{item.group}
       Icon(name="arrow-right" size={12})
+module
+  interface SearchResultProps {
+    item: { group: string; label: string; href: string; description?: string; external?: boolean }
+    closeSearch: () => void
+  }
+
+component SearchResult
+  props { item, closeSearch }: SearchResultProps
+  a.search-result(
+    ~ href={item.href}
+    ~ target="_blank"
+    ~ rel="noreferrer"
+    ~ onClick={closeSearch}
+    ~ )
+    SearchResultContent(item={item})
+
+module
+  interface SearchResultListProps {
+    results: { group: string; label: string; href: string; description?: string; external?: boolean }[]
+    closeSearch: () => void
+  }
+
+component SearchResultList
+  props { results, closeSearch }: SearchResultListProps
+  each item in results key item.href
+    if item.external
+      SearchResult(item={item} closeSearch={closeSearch})
+    else
+      Link(className="search-result" to={item.href} onClick={closeSearch})
+        SearchResultContent(item={item})
+
+component SearchFooter
+  .search-footer
+    span.text-mist-500
+      kbd(className="bg-orange-300! font-semibold text-mist-700! border-mist-500!") esc
+      |  close
+    span.text-mist-500
+      kbd(className="bg-mist-300! font-semibold text-mist-700! border-mist-500! w-6 text-center") ↵
+      |  open
+
+module
+  interface SearchInputProps {
+    inputRef: RefObject<HTMLInputElement | null>
+    query: string
+    setQuery: (next: string | ((prev: string) => string)) => void
+    closeSearch: () => void
+  }
+
+component SearchInput
+  props { inputRef, query, setQuery, closeSearch }: SearchInputProps
+  .search-input-wrap
+    Icon(name="search")
+    input(
+      ~ ref={inputRef}
+      ~ type="search"
+      ~ value={query}
+      ~ onInput={(event) => setQuery(event.currentTarget.value)}
+      ~ placeholder="Search Beast docs…"
+      ~ aria-label="Search Beast docs"
+      ~ )
+    button.search-close(
+      ~ type="button"
+      ~ onClick={closeSearch}
+      ~ aria-label="Close search"
+      ~ )
+      Icon(name="close")
+
+module
+  interface SearchPanelProps {
+    inputRef: RefObject<HTMLInputElement| null>
+    query: string
+    setQuery: (next: string | ((prev: string) => string)) => void
+    closeSearch: () => void
+    results: { group: string; label: string; href: string; description?: string; external?: boolean }[]
+  }
+
+component SearchPanel
+  props { inputRef, query, setQuery, closeSearch, results }: SearchPanelProps
+  div(className="search-panel font-okx")
+    SearchInput(
+      ~ inputRef={inputRef}
+      ~ query={query}
+      ~ setQuery={setQuery}
+      ~ closeSearch={closeSearch}
+      ~ )
+    .search-results(role="listbox" aria-label="Results")
+      if results.length > 0
+        SearchResultList(results={results} closeSearch={closeSearch})
+      else
+        .search-empty
+          span No pages found
+          p Try a language feature, tool, or command.
+    SearchFooter
+
+module
+  interface OpenSearchProps {
+    openSearch: () => void
+  }
+
+component OpenSearch
+  props { openSearch }: OpenSearchProps
+  button(
+    ~ className="search-trigger font-sans px-0 xl:mr-2"
+    ~ type="button"
+    ~ onClick={openSearch}
+    ~ aria-keyshortcuts="/"
+    ~ )
+    Icon(name="search" className="hidden size-4 xl:flex xl:ml-0")
+    span(className='text-sm') Search docs
+    Icon(name="slash" className="xl:-mr-0.5")
+
 component SearchRoot
   setup
-    const dialogRef = useRef<HTMLDialogElement>(null);
-    const inputRef = useRef<HTMLInputElement>(null);
+    const dialogRef = useRef<HTMLDialogElement | null>(null);
+    const inputRef = useRef<HTMLInputElement | null>(null);
     const [query, setQuery] = useState("");
 
     function openSearch() {
@@ -56,15 +167,7 @@ component SearchRoot
         .some((value) => value?.toLowerCase().includes(normalized)));
     }, [query]);
   fragment
-    button(
-      ~ className="search-trigger font-sans px-0 xl:mr-2"
-      ~ type="button"
-      ~ onClick={openSearch}
-      ~ aria-keyshortcuts="/"
-      ~ )
-      Icon(name="search" className="hidden size-4 xl:flex xl:ml-0")
-      span(className='text-sm') Search docs
-      Icon(name="slash" className="xl:-mr-0.5")
+    OpenSearch(openSearch={openSearch})
     dialog.search-dialog(
       ~ ref={dialogRef}
       ~ aria-label="Search Beast documentation"
@@ -73,43 +176,12 @@ component SearchRoot
       ~ closeSearch();
       ~ }}
       ~ )
-      div(className="search-panel font-okx")
-        .search-input-wrap
-          Icon(name="search")
-          input(
-            ~ ref={inputRef}
-            ~ type="search"
-            ~ value={query}
-            ~ onInput={(event) => setQuery(event.currentTarget.value)}
-            ~ placeholder="Search Beast docs…"
-            ~ aria-label="Search Beast docs"
-            ~ )
-          button.search-close(type="button" onClick={closeSearch} aria-label="Close search")
-            Icon(name="close")
-        .search-results(role="listbox" aria-label="Results")
-          if results.length > 0
-            each item in results key item.href
-              if item.external
-                a.search-result(
-                  ~ href={item.href}
-                  ~ target="_blank"
-                  ~ rel="noreferrer"
-                  ~ onClick={closeSearch}
-                  ~ )
-                  SearchResultContent(item={item})
-              else
-                Link(className="search-result" to={item.href} onClick={closeSearch})
-                  SearchResultContent(item={item})
-          else
-            .search-empty
-              span No pages found
-              p Try a language feature, tool, or command.
-        .search-footer
-          span.text-mist-500
-            kbd(className="bg-orange-300! font-semibold text-mist-700! border-mist-500!") esc
-            |  close
-          span.text-mist-500
-            kbd(className="bg-mist-300! font-semibold text-mist-700! border-mist-500! w-6 text-center") ↵
-            |  open
+      SearchPanel(
+        ~ query={query}
+        ~ inputRef={inputRef}
+        ~ setQuery={setQuery}
+        ~ closeSearch={closeSearch}
+        ~ results={results}
+        ~ )
 
 SearchRoot

@@ -20,6 +20,35 @@ component ExternalLink
   a(href={href} target="_blank" rel="noreferrer" className="flex items-center space-x-1 text-sm")
     span(className="text-blue-500 dark:text-blue-400") #{label ?? href}
     Icon(name="arrow-up-right" size={12} className="text-blue-500 animate-bounce")
+module
+  interface TableContainerProps {
+    section: DocSection
+  }
+
+module
+  interface TablebodyProps {
+    section: DocSection
+  }
+
+component Tablebody
+  props { section }: TablebodyProps
+  tbody
+    each row in section.table.rows key row.join("-")
+      tr
+        each cell, index in row key `${cell}-${index}`
+          td
+            InlineText(text={cell})
+
+component TableContainer
+  props { section }: TableContainerProps
+  .table-wrap
+    table
+      thead
+        tr
+          each header in section.table.headers key header
+            th #{header}
+      Tablebody(section={section})
+
 props {section}: Props
 section.article-section(id={section.id})
   div(className="flex items-center space-x-6")
@@ -40,18 +69,7 @@ section.article-section(id={section.id})
   if section.code
     Codeblocks({...section.code})
   if section.table
-    .table-wrap
-      table
-        thead
-          tr
-            each header in section.table.headers key header
-              th #{header}
-        tbody
-          each row in section.table.rows key row.join("-")
-            tr
-              each cell, index in row key `${cell}-${index}`
-                td
-                  InlineText(text={cell})
+    TableContainer(section={section})
   if section.note
     aside(className={`article-note ${section.note.tone === "warning" ? "warning" : "info"}`})
       strong #{section.note.title}

@@ -14,24 +14,25 @@
     "check": "bun run typecheck && bun run build"
   },
   "dependencies": {
-    "@octanejs/motion": "^0.1.54",
-    "beast-tsrx": "latest",
+    "@octanejs/motion": "^0.1.56",
+    "beast-tsrx": "0.6.0",
     "clsx": "^2.1.1",
     "highlight.js": "^11.12.0",
-    "octane": "0.2.6",
+    "octane": "0.6.3",
     "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {
-    "@octanejs/rspack-plugin": "0.1.48",
-    "@rspack/cli": "^2.2.2",
-    "@rspack/core": "^2.2.2",
+    "@beastjs/devtools": "^0.1.12",
+    "@octanejs/rspack-plugin": "0.1.54",
+    "@rspack/cli": "^2.2.8",
+    "@rspack/core": "^2.2.8",
     "@rspack/dev-server": "^2.2.1",
     "@tailwindcss/postcss": "^4.3.3",
-    "@tsrx/typescript-plugin": "0.3.135",
-    "@types/node": "^26.2.0",
+    "@tsrx/typescript-plugin": "0.4.12",
+    "@types/node": "^26.6.3",
     "postcss-loader": "^8.2.1",
     "tailwindcss": "^4.3.3",
     "typescript": "^5.9.3",
-    "wrangler": "4.131.1"
+    "wrangler": "4.143.0"
   }
 }

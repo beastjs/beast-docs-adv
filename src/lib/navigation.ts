@@ -137,8 +137,8 @@ export const navigation: NavigationSection[] = [
     label: 'Resources',
     items: [
       {
-        label: 'Beast Playground',
-        href: `https://playground.beastjs.workers.dev`,
+        label: 'tsx ⟶ btsx ⟶ tsrx',
+        href: `https://beast-converter.beastjs.workers.dev`,
         description: 'Convert TSX to BTSX to TSRX.',
         external: true
       },
