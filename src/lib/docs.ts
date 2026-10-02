@@ -148,6 +148,146 @@ bun run dev`
       }
     ]
   },
+  upgrading: {
+    slug: 'upgrading',
+    eyebrow: 'Get started',
+    title: 'Upgrading to 0.7',
+    description:
+      'Move a Beast project to beast-tsrx 0.7.1 and Octane 0.7.1, including companion packages and the BTSX changes to know about.',
+    sections: [
+      {
+        id: 'release',
+        title: 'Beast 0.7.1',
+        paragraphs: [
+          'Beast 0.7.1 aligns the compiler, `create-beast`, and the skills with Octane 0.7.1. It covers every Octane release since 0.6.0 (0.6.1–0.6.3, 0.7.0, and 0.7.1), maps the new Octane 0.7 template errors to BTSX lines, adds `BEAST1904_SCOPE_RETURN`, and ships a redesigned starter.'
+        ],
+        external: { label: 'Release notes', href: 'https://github.com/beastjs/beast/releases/tag/0.7.1' }
+      },
+      {
+        id: 'install',
+        title: 'Upgrade the packages',
+        paragraphs: [
+          'Octane 0.6 peer ranges do not include 0.7, so upgrade the runtime, compiler, and every `@octanejs/*` binding together. Then rebuild client and server output together.'
+        ],
+        code: {
+          filename: 'Terminal',
+          language: 'shell',
+          code: `bun add octane@0.7.1 beast-tsrx@0.7.1
+# Rspack
+bun add -d @octanejs/rspack-plugin@0.1.55
+# Rsbuild
+bun add @octanejs/rsbuild-plugin@0.1.57`
+        }
+      },
+      {
+        id: 'companions',
+        title: 'Companion packages',
+        table: {
+          headers: ['Package', 'Version', 'Octane peer'],
+          rows: [
+            ['@octanejs/rspack-plugin', '0.1.55', '^0.7.0'],
+            ['@octanejs/rsbuild-plugin', '0.1.57', '^0.7.0'],
+            ['@octanejs/base-ui', '0.1.58', '^0.7.0'],
+            ['@octanejs/radix', '0.1.58', '^0.7.0'],
+            ['@octanejs/shadcn', '0.0.47', '^0.7.0'],
+            ['@octanejs/remix-router', '0.1.53', '^0.7.0'],
+            ['@octanejs/tanstack-router', '0.1.60', '^0.7.0']
+          ]
+        }
+      },
+      {
+        id: 'btsx-changes',
+        title: 'What changes for BTSX',
+        paragraphs: [
+          'BTSX control-flow arms (`if`, `each`, `switch`, `try`) have no setup of their own, so Octane 0.7’s early-exit rework reaches BTSX mainly through `scope`, which lowers to an `@{ … }` block.'
+        ],
+        list: [
+          '`break` and `continue` cannot leave a `scope`. This used to compile and then fail at load time with “Illegal continue statement”; it is now a compile error. Filter the iterable before the `each`, or render the row from an `if` arm.',
+          'A `return` in a `scope`’s setup is reported by Beast as `BEAST1904_SCOPE_RETURN` at the keyword. Returns inside loop bodies and nested functions are still allowed.',
+          '`textarea` children must be text. Inline text and `#{…}` interpolations render as one run of text; an element child is a compile error.',
+          '`"use strong"` belongs in a `module` block. In `setup` it now reports `OCTANE_STRONG_DIRECTIVE_PLACEMENT` instead of silently compiling in compat mode.',
+          'A local `component` with `if`/`each` arms can be attached with `Object.assign(Menu, { Item })` from a `module` block and rendered as `Menu.Item`. 0.7.1 fixes the 0.7.0 regression that broke this.',
+          'Row keys hoisted from an `each` row’s only root into the `@for` header generate the same TSRX as before and run identically.'
+        ]
+      },
+      {
+        id: 'scope-exit',
+        title: 'Rewriting a scope exit',
+        code: {
+          filename: 'src/List.btsx',
+          language: 'btsx',
+          code: `// Before: compile error in 0.7
+each item in items key item.id
+  scope
+    setup
+      if (!item) continue;
+    li #{item.label}
+
+// After: filter first
+each item in items.filter(Boolean) key item.id
+  li #{item.label}`
+        }
+      },
+      {
+        id: 'runtime',
+        title: 'Runtime changes worth knowing',
+        paragraphs: ['These need no source change but can change observable behavior.'],
+        list: [
+          '`useOptimistic` without a reducer treats a function action as an updater of the pending state, as `useState` does.',
+          'Queued `useActionState` dispatches run the action that was current when dispatched, matching React 19.',
+          'Hydration now reports and repairs stale server content it used to keep silently: list length mismatches, text-versus-element holes, and parser-repaired markup such as a `div` inside a `p`. Expect new `onRecoverableError` reports; they expose existing bugs.',
+          'A reassigned variable read by JSX is captured when the JSX evaluates, as in React.',
+          'In Node, Octane reads `process.env.NODE_ENV` once per module. Set `NODE_ENV` before the first Octane import in custom server entries.',
+          'Production builds report signal, hydration, and DOM-binding errors as `Minified Octane error #<code>` messages.'
+        ]
+      },
+      {
+        id: 'starter',
+        title: 'The new starter',
+        paragraphs: [
+          '`bun create beast@latest` now scaffolds one quiet screen: a headline, a stateful counter, and a keyed loop over resource links in about 30 lines of BTSX. Its stylesheet follows the system light or dark theme and respects reduced motion. The CSS and Tailwind templates share identical markup.'
+        ],
+        code: {
+          filename: 'src/App.btsx',
+          language: 'btsx',
+          code: `import { useState } from 'octane'
+
+module
+  interface Props { docsUrl: string }
+
+props { docsUrl }: Props
+setup
+  const [count, setCount] = useState(0);
+  const links = [
+    { label: 'Documentation', href: docsUrl },
+    { label: 'Octane', href: 'https://octanejs.dev' },
+    { label: 'GitHub', href: 'https://github.com/beastjs/beast' },
+  ];
+
+main.page
+  img.mark(src="/beast.svg" alt="Beast" width="28" height="28")
+
+  h1.title
+    span Build fast apps fast.
+    span.quiet Even faster with machines.
+
+  button.counter(type="button" onClick={() => setCount(count + 1)})
+    span Count
+    output(aria-live="polite") #{count}
+
+  footer.foot
+    p.hint
+      code src/App.btsx
+      span Edit and save to reload.
+    nav.links(aria-label="Resources")
+      each link in links key link.label
+        a(href={link.href} target="_blank" rel="noopener noreferrer")
+          | #{link.label}
+          span(aria-hidden="true") ↗`
+        }
+      }
+    ]
+  },
   'how-it-works': {
     slug: 'how-it-works',
     eyebrow: 'Get started',
@@ -780,8 +920,8 @@ import { NativePanel } from "./NativePanel.tsrx";`
         code: {
           filename: 'Terminal',
           language: 'shell',
-          code: `npm install octane@0.2.0
-npm install --save-dev @rspack/core@^2 @octanejs/rspack-plugin@0.1.47`
+          code: `npm install octane@0.7.1
+npm install --save-dev @rspack/core@^2 @octanejs/rspack-plugin@0.1.55`
         }
       },
       {
@@ -824,7 +964,7 @@ export default {
         code: {
           filename: 'Terminal',
           language: 'shell',
-          code: `npm install octane@0.2.0 @octanejs/rsbuild-plugin@0.1.47
+          code: `npm install octane@0.7.1 @octanejs/rsbuild-plugin@0.1.57
 npm install --save-dev @rsbuild/core@^2`
         }
       },
@@ -949,12 +1089,16 @@ console.log(result.manifestPath, result.removed);`
           rows: [
             ['Node.js', '>=22.22.2'],
             ['TypeScript', '^5.9.3'],
-            ['TSRX TypeScript plugin', '0.3.129'],
-            ['Octane', '0.2.0'],
+            ['TSRX TypeScript plugin', '0.3.135'],
+            ['Octane', '0.7.1'],
             ['Vite', '^8.0.16'],
-            ['Octane Rspack/Rsbuild plugins', '0.1.47'],
+            ['Octane Rspack/Rsbuild plugins', '0.1.55 / 0.1.57'],
             ['Rspack / Rsbuild', '^2.0.0']
           ]
+        },
+        note: {
+          title: 'Coordinated versions',
+          body: '`beast-tsrx`, `create-beast`, and the skills mirror the supported Octane release number, currently 0.7.1. Rebuild server and client output together when upgrading, and move UI and router bindings to their `^0.7.0` peer line.'
         }
       }
     ]
@@ -997,6 +1141,34 @@ Use spaces to define the template tree.`
         note: {
           title: 'TypeScript validation',
           body: 'Embedded expressions remain source slices. Octane performs their final language-level TypeScript validation.'
+        }
+      },
+      {
+        id: 'octane-errors',
+        title: 'Octane template errors',
+        paragraphs: [
+          'Errors raised by Octane while validating the generated TSRX are mapped back to the authored `.btsx` line in the Vite, Rspack, CLI, and project compilers. Since 0.7.1 this includes errors that carry their location only in the message text, such as element children inside `textarea` and `break`/`continue` leaving a `scope` block.',
+          '`mapGeneratedError` accepts the generated TSRX as an optional fifth argument so it can also place parser errors that only report an offset.'
+        ]
+      },
+      {
+        id: 'scope-return',
+        title: 'BEAST1904_SCOPE_RETURN',
+        paragraphs: [
+          'A `return` that would leave a `scope` block is rejected by Octane without a location. Beast 0.7.1 reports it itself, pointing at the `return` keyword. A `return` inside a loop body or a nested function is valid and is not reported.'
+        ],
+        code: {
+          filename: 'src/Row.btsx',
+          language: 'btsx',
+          code: `each item in items key item.id
+  scope
+    setup
+      if (!item.visible) return; // BEAST1904_SCOPE_RETURN
+    li #{item.label}`
+        },
+        note: {
+          title: 'Fix',
+          body: 'Render the content from an `if` branch, filter the iterable before the `each`, or move the early return into a component’s own `setup`.'
         }
       }
     ]
@@ -1970,7 +2142,7 @@ section.status-card(aria-live="polite")
         },
         note: {
           title: 'Run locally',
-          body: 'Clone `phtn/beast`, run `bun run build && bun test` to regenerate goldens, or open any `examples/*/ *.btsx` alongside its `*.tsrx` for byte-exact comparison.'
+          body: 'Clone `beastjs/beast`, run `bun run build && bun test` to regenerate goldens, or open any `examples/*/ *.btsx` alongside its `*.tsrx` for byte-exact comparison.'
         }
       },
       {
@@ -1998,7 +2170,7 @@ section.status-card(aria-live="polite")
         },
         note: {
           title: 'Run locally',
-          body: 'Clone `phtn/beast`, run `bun run build && bun test` to regenerate goldens, or open any `examples/*/ *.btsx` alongside its `*.tsrx` for byte-exact comparison.'
+          body: 'Clone `beastjs/beast`, run `bun run build && bun test` to regenerate goldens, or open any `examples/*/ *.btsx` alongside its `*.tsrx` for byte-exact comparison.'
         }
       }
     ]

@@ -428,12 +428,6 @@ export const icons = {
     viewBox: '0 0 16 16',
     set: 'lucide'
   },
-  terminal: {
-    symbol:
-      '<g transform="scale(0.667)"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19h8M4 17l6-6-6-6"/></g>',
-    viewBox: '0 0 16 16',
-    set: 'lucide'
-  },
   desktop: {
     symbol:
       '<g transform="scale(0.667)"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="20" height="14" rx="2" transform="translate(2 3)"/><path d="M8 21h8m-4-4v4" fill="currentColor"/></g></g>',

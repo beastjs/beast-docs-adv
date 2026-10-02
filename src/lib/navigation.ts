@@ -10,7 +10,7 @@ export type NavigationSection = {
   items: NavigationItem[]
 }
 
-export const githubUrl = 'https://github.com/phtn/beast'
+export const githubUrl = 'https://github.com/beastjs/beast'
 
 export const navigation: NavigationSection[] = [
   {
@@ -30,6 +30,11 @@ export const navigation: NavigationSection[] = [
         label: 'How it works',
         href: '/docs/how-it-works',
         description: 'Follow BTSX from source to browser.'
+      },
+      {
+        label: 'Upgrading to 0.7',
+        href: '/docs/upgrading',
+        description: 'Move to beast-tsrx and Octane 0.7.1.'
       }
     ]
   },

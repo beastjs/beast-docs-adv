@@ -14,16 +14,16 @@
     "check": "bun run typecheck && bun run build"
   },
   "dependencies": {
-    "@octanejs/motion": "^0.1.56",
-    "beast-tsrx": "0.6.0",
+    "@octanejs/motion": "^0.1.57",
+    "beast-tsrx": "0.7.1",
     "clsx": "^2.1.1",
     "highlight.js": "^11.12.0",
-    "octane": "0.6.3",
+    "octane": "0.7.1",
     "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {
     "@beastjs/devtools": "^0.1.12",
-    "@octanejs/rspack-plugin": "0.1.54",
+    "@octanejs/rspack-plugin": "0.1.55",
     "@rspack/cli": "^2.2.8",
     "@rspack/core": "^2.2.8",
     "@rspack/dev-server": "^2.2.1",

@@ -1,6 +1,6 @@
 # beast.docs
 
-The documentation site for [Beast](https://github.com/phtn/beast), the
+The documentation site for [Beast](https://github.com/beastjs/beast), the
 indentation-first component language that compiles `.btsx` into
 [TSRX](https://tsrx.dev/) for [Octane](https://octanejs.dev/).
 
@@ -55,7 +55,7 @@ src/
     docs.ts                All documentation page content
     btsx-hljs.ts           highlight.js setup with BTSX/TSRX grammars
     router.ts              usePathname, navigate, route chunk loaders
-    release.ts             Latest Beast release lookup (GitHub API)
+    release.ts             Latest Beast release lookup (npm registry)
     icons/                 SVG icon set and the <Icon> component
 ```
 
